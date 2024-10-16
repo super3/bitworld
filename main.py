@@ -3,52 +3,57 @@ import pygame
 # Initialize Pygame
 pygame.init()
 
-# Set up the display
+# Display settings
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 300
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Simworld")
 
-# Define colors
+# Color definitions
 BACKGROUND_COLOR = (142, 210, 255)  # #8ed2ff in RGB
+GROUND_COLOR = (169, 87, 76)  # #a9574c in RGB
+GRASS_COLOR = (48, 151, 108)  # #30976c in RGB
 
-# Load the sprite sheet
-sprite_sheet = pygame.image.load("NPC/NPC 1.png").convert_alpha()
+# Sprite settings
+SPRITE_WIDTH, SPRITE_HEIGHT = 32, 32
+SCALE_FACTOR = 2
 
-# Extract the idle and walk animation frames (assuming 32x32 pixel sprites)
-sprite_width, sprite_height = 32, 32
-idle_frames = [
-    sprite_sheet.subsurface(pygame.Rect(i * sprite_width, sprite_height, sprite_width, sprite_height))
-    for i in range(3)
-]
-walk_frames = [
-    sprite_sheet.subsurface(pygame.Rect(i * sprite_width, 0, sprite_width, sprite_height))
-    for i in range(4)
-]
+# Load and process sprite sheet
+def load_sprite_frames(sprite_sheet, row, num_frames):
+    frames = [
+        sprite_sheet.subsurface(pygame.Rect(i * SPRITE_WIDTH, row * SPRITE_HEIGHT, SPRITE_WIDTH, SPRITE_HEIGHT))
+        for i in range(num_frames)
+    ]
+    return [pygame.transform.scale(frame, (SPRITE_WIDTH * SCALE_FACTOR, SPRITE_HEIGHT * SCALE_FACTOR)) for frame in frames]
 
-# Scale the sprites
-scale_factor = 2
-idle_frames = [pygame.transform.scale(frame, (sprite_width * scale_factor, sprite_height * scale_factor)) for frame in idle_frames]
-walk_frames = [pygame.transform.scale(frame, (sprite_width * scale_factor, sprite_height * scale_factor)) for frame in walk_frames]
+sprite_sheet = pygame.image.load("NPC/Male/NPC 1.png").convert_alpha()
+idle_frames = load_sprite_frames(sprite_sheet, 1, 3)
+walk_frames = load_sprite_frames(sprite_sheet, 0, 4)
 
-# Animation variables
-current_frame = 0
-animation_speed = 3  # Frames per second for idle animation
-walk_animation_speed = 8  # Frames per second for walk animation
-animation_timer = 0
+# Animation settings
+IDLE_ANIMATION_SPEED = 3  # Frames per second
+WALK_ANIMATION_SPEED = 8  # Frames per second
 
-# Character position, movement, and direction
+# Character settings
 char_x = (WINDOW_WIDTH - idle_frames[0].get_width()) // 2
-char_y = WINDOW_HEIGHT - idle_frames[0].get_height() + 16
-char_speed = 100  # Pixels per second
+char_y = WINDOW_HEIGHT - idle_frames[0].get_height()
+CHAR_SPEED = 100  # Pixels per second
+
+# Environment settings
+GROUND_HEIGHT = 13
+GRASS_HEIGHT = 2
+
+# Game state
+running = True
+clock = pygame.time.Clock()
+current_frame = 0
+animation_timer = 0
 facing_right = True
 is_walking = False
 
 # Main game loop
-running = True
-clock = pygame.time.Clock()
 while running:
-    # Calculate delta time
+    # Time management
     dt = clock.tick(60) / 1000.0  # Convert to seconds
 
     # Event handling
@@ -56,20 +61,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Handle continuous key presses
+    # Input handling
     keys = pygame.key.get_pressed()
     is_walking = False
     if keys[pygame.K_a]:
-        char_x = max(0, char_x - char_speed * dt)
-        facing_right = False  # Update direction when moving left
+        char_x = max(0, char_x - CHAR_SPEED * dt)
+        facing_right = False
         is_walking = True
     if keys[pygame.K_d]:
-        char_x = min(WINDOW_WIDTH - idle_frames[0].get_width(), char_x + char_speed * dt)
-        facing_right = True  # Update direction when moving right
+        char_x = min(WINDOW_WIDTH - idle_frames[0].get_width(), char_x + CHAR_SPEED * dt)
+        facing_right = True
         is_walking = True
 
-    # Update animation
-    current_speed = walk_animation_speed if is_walking else animation_speed
+    # Animation update
+    current_speed = WALK_ANIMATION_SPEED if is_walking else IDLE_ANIMATION_SPEED
     animation_timer += clock.get_time()
     if animation_timer >= 1000 // current_speed:
         if is_walking:
@@ -78,22 +83,23 @@ while running:
             current_frame = (current_frame + 1) % len(idle_frames)
         animation_timer = 0
 
-    # Fill the screen with the background color
+    # Drawing
     screen.fill(BACKGROUND_COLOR)
+    pygame.draw.rect(screen, GROUND_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT, WINDOW_WIDTH, GROUND_HEIGHT))
+    pygame.draw.rect(screen, GRASS_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT - GRASS_HEIGHT, WINDOW_WIDTH, GRASS_HEIGHT))
 
-    # Get the current frame and flip it if facing left
+    # Character rendering
     if is_walking:
         current_sprite = walk_frames[current_frame % len(walk_frames)]
     else:
         current_sprite = idle_frames[current_frame % len(idle_frames)]
+
     if not facing_right:
         current_sprite = pygame.transform.flip(current_sprite, True, False)
-
-    # Draw the current frame
     screen.blit(current_sprite, (int(char_x), char_y))
 
-    # Update the display
+    # Display update
     pygame.display.flip()
 
-# Quit Pygame
+# Cleanup
 pygame.quit()
