@@ -51,6 +51,24 @@ animation_timer = 0
 facing_right = True
 is_walking = False
 
+# Font settings
+pygame.font.init()
+FONT_SIZE = 20
+font = pygame.font.Font(None, FONT_SIZE)
+
+# Text box settings
+TEXT_BOX_WIDTH = 200
+TEXT_BOX_HEIGHT = WINDOW_HEIGHT
+TEXT_BOX_X = WINDOW_WIDTH  # Changed from 0 to WINDOW_WIDTH
+TEXT_BOX_Y = 0
+TEXT_BOX_COLOR = (200, 200, 200)  # Light gray
+TEXT_COLOR = (0, 0, 0)  # Black
+
+# Adjust window size to include text box
+TOTAL_WIDTH = WINDOW_WIDTH + TEXT_BOX_WIDTH
+screen = pygame.display.set_mode((TOTAL_WIDTH, WINDOW_HEIGHT))
+pygame.display.set_caption("Simworld")
+
 # Main game loop
 while running:
     # Time management
@@ -85,18 +103,45 @@ while running:
 
     # Drawing
     screen.fill(BACKGROUND_COLOR)
-    pygame.draw.rect(screen, GROUND_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT, WINDOW_WIDTH, GROUND_HEIGHT))
-    pygame.draw.rect(screen, GRASS_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT - GRASS_HEIGHT, WINDOW_WIDTH, GRASS_HEIGHT))
+    
+    # Draw text box
+    pygame.draw.rect(screen, TEXT_BOX_COLOR, (TEXT_BOX_X, TEXT_BOX_Y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT))
+    
+    # Render some example text in the text box
+    text_lines = [
+        "This is a",
+        "non-editable",
+        "text box.",
+        "",
+        "You can use",
+        "this to display",
+        "game information",
+        "or instructions."
+    ]
+    
+    for i, line in enumerate(text_lines):
+        text_surface = font.render(line, True, TEXT_COLOR)
+        screen.blit(text_surface, (TEXT_BOX_X + 10, TEXT_BOX_Y + 10 + i * (FONT_SIZE + 5)))
 
-    # Character rendering
+    # Create a surface for the main game area
+    game_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    game_surface.fill(BACKGROUND_COLOR)
+    
+    # Draw ground and grass on game surface
+    pygame.draw.rect(game_surface, GROUND_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT, WINDOW_WIDTH, GROUND_HEIGHT))
+    pygame.draw.rect(game_surface, GRASS_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT - GRASS_HEIGHT, WINDOW_WIDTH, GRASS_HEIGHT))
+
+    # Draw character on game surface
     if is_walking:
         current_sprite = walk_frames[current_frame % len(walk_frames)]
     else:
         current_sprite = idle_frames[current_frame % len(idle_frames)]
-
     if not facing_right:
         current_sprite = pygame.transform.flip(current_sprite, True, False)
-    screen.blit(current_sprite, (int(char_x), char_y))
+    game_surface.blit(current_sprite, (int(char_x), int(char_y)))
+
+    # Draw game surface on main screen
+    screen.blit(game_surface, (0, 0))  # Changed from (TEXT_BOX_WIDTH, 0) to (0, 0)
 
     # Display update
     pygame.display.flip()
