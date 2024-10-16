@@ -4,12 +4,16 @@ import pygame
 pygame.init()
 
 # Set up the display
-width, height = 400, 300
-screen = pygame.display.set_mode((width, height))
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 300
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Simworld")
 
+# Define colors
+BACKGROUND_COLOR = (142, 210, 255)  # #8ed2ff in RGB
+
 # Load the sprite sheet
-sprite_sheet = pygame.image.load("NPC 1.png").convert_alpha()
+sprite_sheet = pygame.image.load("NPC/NPC 1.png").convert_alpha()
 
 # Extract the idle and walk animation frames (assuming 32x32 pixel sprites)
 sprite_width, sprite_height = 32, 32
@@ -34,8 +38,8 @@ walk_animation_speed = 8  # Frames per second for walk animation
 animation_timer = 0
 
 # Character position, movement, and direction
-char_x = (width - idle_frames[0].get_width()) // 2
-char_y = height - idle_frames[0].get_height() + 16
+char_x = (WINDOW_WIDTH - idle_frames[0].get_width()) // 2
+char_y = WINDOW_HEIGHT - idle_frames[0].get_height() + 16
 char_speed = 100  # Pixels per second
 facing_right = True
 is_walking = False
@@ -60,7 +64,7 @@ while running:
         facing_right = False  # Update direction when moving left
         is_walking = True
     if keys[pygame.K_d]:
-        char_x = min(width - idle_frames[0].get_width(), char_x + char_speed * dt)
+        char_x = min(WINDOW_WIDTH - idle_frames[0].get_width(), char_x + char_speed * dt)
         facing_right = True  # Update direction when moving right
         is_walking = True
 
@@ -74,8 +78,8 @@ while running:
             current_frame = (current_frame + 1) % len(idle_frames)
         animation_timer = 0
 
-    # Fill the screen with white color
-    screen.fill((255, 255, 255))
+    # Fill the screen with the background color
+    screen.fill(BACKGROUND_COLOR)
 
     # Get the current frame and flip it if facing left
     if is_walking:
