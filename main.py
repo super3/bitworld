@@ -17,20 +17,42 @@ GROUND_COLOR = (169, 87, 76)  # #a9574c in RGB
 GRASS_COLOR = (48, 151, 108)  # #30976c in RGB
 
 # Sprite settings
-SPRITE_WIDTH, SPRITE_HEIGHT = 32, 32
+CHAR_SPRITE_WIDTH, CHAR_SPRITE_HEIGHT = 32, 32  # Character sprite size
+INFRA_SPRITE_WIDTH, INFRA_SPRITE_HEIGHT = 16, 16  # Infrastructure sprite size
 SCALE_FACTOR = 2
 
 # Load and process sprite sheet
-def load_sprite_frames(sprite_sheet, row, num_frames):
+def load_sprite_frames(sprite_sheet, row, num_frames, sprite_width, sprite_height):
     frames = [
-        sprite_sheet.subsurface(pygame.Rect(i * SPRITE_WIDTH, row * SPRITE_HEIGHT, SPRITE_WIDTH, SPRITE_HEIGHT))
+        sprite_sheet.subsurface(pygame.Rect(i * sprite_width, row * sprite_height, sprite_width, sprite_height))
         for i in range(num_frames)
     ]
-    return [pygame.transform.scale(frame, (SPRITE_WIDTH * SCALE_FACTOR, SPRITE_HEIGHT * SCALE_FACTOR)) for frame in frames]
+    return [pygame.transform.scale(frame, (sprite_width * SCALE_FACTOR, sprite_height * SCALE_FACTOR)) for frame in frames]
 
+def load_infrastructure_tile(sprite_sheet, row, col):
+    tile = sprite_sheet.subsurface(pygame.Rect(
+        col * INFRA_SPRITE_WIDTH, 
+        row * INFRA_SPRITE_HEIGHT, 
+        INFRA_SPRITE_WIDTH, 
+        INFRA_SPRITE_HEIGHT
+    ))
+    return pygame.transform.scale(tile, (INFRA_SPRITE_WIDTH * SCALE_FACTOR, INFRA_SPRITE_HEIGHT * SCALE_FACTOR))
+
+# Load sprite sheets
 sprite_sheet = pygame.image.load("NPC/Male/NPC 1.png").convert_alpha()
-idle_frames = load_sprite_frames(sprite_sheet, 1, 3)
-walk_frames = load_sprite_frames(sprite_sheet, 0, 4)
+infrastructure_sheet = pygame.image.load("World/Infrastructure.png").convert_alpha()
+
+# Load character frames
+idle_frames = load_sprite_frames(sprite_sheet, 1, 3, CHAR_SPRITE_WIDTH, CHAR_SPRITE_HEIGHT)
+walk_frames = load_sprite_frames(sprite_sheet, 0, 4, CHAR_SPRITE_WIDTH, CHAR_SPRITE_HEIGHT)
+
+# Infrastructure constants
+INFRA_ROWS = 36
+INFRA_COLS = 33
+
+# Example of loading a specific infrastructure tile (row 0, col 0)
+# You can load more tiles as needed using their row/col coordinates
+example_tile = load_infrastructure_tile(infrastructure_sheet, 0, 0)
 
 # Animation settings
 IDLE_ANIMATION_SPEED = 3  # Frames per second
@@ -77,72 +99,16 @@ class Player:
     def __init__(self, first_name, last_name):
         self.first_name = first_name
         self.last_name = last_name
-        self.hunger = 0  # 0 is not hungry, 100 is starving
-        self.thirst = 0  # 0 is not thirsty, 100 is very thirsty
-        self.money = 100  # Starting money
         self.x = WINDOW_WIDTH // 2
-        self.y = WINDOW_HEIGHT - GROUND_HEIGHT - CHAR_HEIGHT + 15  # Adjusted y position
+        self.y = WINDOW_HEIGHT - GROUND_HEIGHT - CHAR_HEIGHT
         self.facing_right = True
-        self.inventory = []
-        self.target_apple = None
-        self.speed = 100  # Pixels per second, adjust as needed
-        self.y = WINDOW_HEIGHT - GROUND_HEIGHT - CHAR_HEIGHT  # Set initial y position on the ground
-
-    def find_nearest_apple(self, apples):
-        if not apples:
-            return None
-        return min(apples, key=lambda apple: abs(apple[0] - self.x))
-
-    def move_towards_apple(self, apples, dt):
-        if self.hunger <= 1:
-            self.target_apple = None
-            return False
-
-        self.target_apple = self.find_nearest_apple(apples)
-        
-        if self.target_apple:
-            dx = self.target_apple[0] - self.x
-            distance = abs(dx)
-            
-            if distance < 5:  # If close enough to pick up
-                self.inventory.append(self.target_apple)
-                apples.remove(self.target_apple)
-                self.target_apple = None
-                self.hunger = max(0, self.hunger - 10)  # Decrease hunger when apple is eaten
-                return False
-            else:
-                # Move towards the apple (horizontally only)
-                move_distance = min(self.speed * dt, distance)
-                self.x += move_distance if dx > 0 else -move_distance
-                self.facing_right = dx > 0
-                return True
-        return False
+        self.speed = 100
 
     def update(self, dt):
-        self.hunger += 0.1 * dt  # Increased much more slowly
-        self.hunger = min(self.hunger, 100)  # Cap hunger at 100
+        pass  # Removed hunger/thirst updates
 
 # Initialize player
 player = Player("John", "Sim")
-
-# Load apple image
-apple_image = pygame.image.load("World/Apple.png").convert_alpha()
-apple_image = pygame.transform.scale(apple_image, (15, 15))  # Smaller size
-
-# Assuming you have a GROUND_HEIGHT constant defined somewhere
-# If not, add this line (adjust the value as needed):
-# GROUND_HEIGHT = 50  # Height of the ground from the bottom of the screen
-
-# Calculate the y-coordinate for apples
-APPLE_Y = WINDOW_HEIGHT - GROUND_HEIGHT - 15 - 2  # Place apples just above the ground and 2 pixels up
-
-# Function to generate random apple positions
-def generate_apples(num_apples):
-    return [(random.randint(0, WINDOW_WIDTH - 15), APPLE_Y) 
-            for _ in range(num_apples)]
-
-# Generate initial apples (only once, before the game loop)
-apples = generate_apples(5)  # 5 apples, generated once
 
 # Main game loop
 while running:
@@ -157,19 +123,16 @@ while running:
     keys = pygame.key.get_pressed()
     is_walking = False
 
-    if any([keys[pygame.K_LEFT], keys[pygame.K_RIGHT], keys[pygame.K_a], keys[pygame.K_d]]):
+    if keys[pygame.K_a] or keys[pygame.K_d]:
         # Player-controlled movement (horizontal only)
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_a]:
             player.x -= player.speed * dt
             player.facing_right = False
             is_walking = True
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        elif keys[pygame.K_d]:
             player.x += player.speed * dt
             player.facing_right = True
             is_walking = True
-    elif player.hunger > 1:
-        # Automatic movement towards nearest apple if hungry
-        is_walking = player.move_towards_apple(apples, dt)
 
     # Animation update
     current_speed = WALK_ANIMATION_SPEED if is_walking else IDLE_ANIMATION_SPEED
@@ -193,13 +156,9 @@ while running:
     # Update text box content
     text_lines = [
         f"Name: {player.first_name} {player.last_name}",
-        f"Hunger: {player.hunger:.1f}",
-        f"Thirst: {player.thirst:.1f}",
-        f"Money: ${player.money:.2f}",
-        f"Apples: {len(player.inventory)}",
         "",
         "Controls:",
-        "Arrow keys - Move",
+        "A/D - Move left/right",
         "Esc - Quit"
     ]
     
@@ -217,10 +176,6 @@ while running:
     # Draw grass
     pygame.draw.rect(game_surface, GRASS_COLOR, (0, WINDOW_HEIGHT - GROUND_HEIGHT - GRASS_HEIGHT, WINDOW_WIDTH, GRASS_HEIGHT))
     
-    # Draw apples
-    for apple_pos in apples:
-        game_surface.blit(apple_image, apple_pos)
-
     # Draw character on game surface
     if is_walking:
         current_sprite = walk_frames[current_frame % len(walk_frames)]
