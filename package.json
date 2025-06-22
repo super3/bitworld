@@ -1,0 +1,20 @@
+{
+  "name": "simworld-js",
+  "version": "1.0.0",
+  "description": "A 2D simulation world game built with Phaser.js",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -o",
+    "dev": "npx live-server --port=8080"
+  },
+  "keywords": ["phaser", "game", "simulation", "2d"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "phaser": "^3.70.0"
+  }
+} 

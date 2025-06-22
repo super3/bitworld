@@ -1,0 +1,36 @@
+/**
+ * Main game initialization and configuration
+ */
+
+// Phaser game configuration
+const config = {
+    type: Phaser.AUTO,
+    width: GameConfig.TOTAL_WIDTH,
+    height: GameConfig.WINDOW_HEIGHT,
+    parent: 'game-container',
+    backgroundColor: GameConfig.BACKGROUND_COLOR,
+    scene: GameScene,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+};
+
+// Initialize the game
+const game = new Phaser.Game(config);
+
+// Handle ESC key to quit (close window/tab)
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        if (confirm('Are you sure you want to quit?')) {
+            window.close();
+        }
+    }
+}); 
