@@ -7,7 +7,12 @@
     "start": "npx http-server . -p 8080 -o",
     "dev": "npx live-server --port=8080"
   },
-  "keywords": ["phaser", "game", "simulation", "2d"],
+  "keywords": [
+    "phaser",
+    "game",
+    "simulation",
+    "2d"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -17,4 +22,4 @@
   "dependencies": {
     "phaser": "^3.70.0"
   }
-} 
+}
