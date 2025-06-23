@@ -90,19 +90,27 @@ class GameScene extends Phaser.Scene {
     }
 
     createBuilding() {
-        const buildingSprites = ['lobby', 'design1', 'design2', 'design3', 'roof'];
+        const floorSprites = ['lobby', 'design1', 'design2', 'design3'];
         const scaledWidth = GameConfig.BUILDING_WIDTH * GameConfig.BUILDING_SCALE;
         const scaledHeight = GameConfig.BUILDING_HEIGHT * GameConfig.BUILDING_SCALE;
         
         // Calculate building x position (centered)
         const buildingX = GameConfig.WINDOW_WIDTH / 2;
 
-        // Create building floors from bottom to top
-        buildingSprites.forEach((spriteName, index) => {
+        // Create building floors from bottom to top (excluding roof)
+        floorSprites.forEach((spriteName, index) => {
             const yPos = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - scaledHeight * (index + 1) + scaledHeight / 2;
             const buildingFloor = this.add.image(buildingX, yPos, spriteName);
             buildingFloor.setScale(GameConfig.BUILDING_SCALE);
         });
+
+        // Position roof directly on top of the highest floor (design3)
+        // Top floor center is at: WINDOW_HEIGHT - GROUND_HEIGHT - scaledHeight * 4 + scaledHeight / 2
+        // Top floor top edge is at: topFloorCenter - scaledHeight / 2 = WINDOW_HEIGHT - GROUND_HEIGHT - scaledHeight * 4
+        // Roof center should be at: topFloorTopEdge - scaledHeight / 2, but move it down a bit to close the gap
+        const roofY = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - scaledHeight * 4.3;
+        const roof = this.add.image(buildingX, roofY, 'roof');
+        roof.setScale(GameConfig.BUILDING_SCALE);
     }
 
     createAnimations() {
