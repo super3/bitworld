@@ -5,7 +5,10 @@
   "main": "index.html",
   "scripts": {
     "start": "npx http-server . -p 8080 -o",
-    "dev": "npx live-server --port=8080"
+    "dev": "npx live-server --port=8080",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [
     "phaser",
@@ -16,10 +19,25 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@jest/globals": "^30.0.2",
     "http-server": "^14.1.1",
+    "jest": "^30.0.2",
     "live-server": "^1.2.2"
   },
   "dependencies": {
     "phaser": "^3.70.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/__tests__/**/*.js"
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "collectCoverageFrom": [
+      "js/**/*.js",
+      "!js/main.js",
+      "!**/node_modules/**"
+    ]
   }
 }
