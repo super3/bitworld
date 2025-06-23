@@ -144,7 +144,7 @@ class GameScene extends Phaser.Scene {
     }
 
     createTextBox() {
-        // Create text box background
+        // Create clean pixel art style background
         this.textBoxBg = this.add.rectangle(
             GameConfig.WINDOW_WIDTH + GameConfig.TEXT_BOX_WIDTH / 2,
             GameConfig.WINDOW_HEIGHT / 2,
@@ -153,28 +153,98 @@ class GameScene extends Phaser.Scene {
             GameConfig.TEXT_BOX_COLOR
         );
 
-        // Create text elements
-        const textLines = [
-            `Name: ${this.player.firstName} ${this.player.lastName}`,
-            "",
-            "Controls:",
-            "A/D - Move left/right",
-            "Esc - Quit"
-        ];
+        // Create a simple border line
+        this.borderLine = this.add.rectangle(
+            GameConfig.WINDOW_WIDTH,
+            GameConfig.WINDOW_HEIGHT / 2,
+            4,
+            GameConfig.WINDOW_HEIGHT,
+            0x2c3e50  // Dark blue-gray for clean separation
+        );
 
-        this.textElements = [];
-        textLines.forEach((line, index) => {
-            const textObj = this.add.text(
-                GameConfig.WINDOW_WIDTH + 10,
-                10 + index * (GameConfig.FONT_SIZE + 5),
-                line,
-                {
-                    fontSize: `${GameConfig.FONT_SIZE}px`,
-                    fill: '#000000'
-                }
-            );
-            this.textElements.push(textObj);
-        });
+        // Player name 
+        this.playerNameText = this.add.text(
+            GameConfig.WINDOW_WIDTH + 20,
+            30,
+            `${this.player.firstName} ${this.player.lastName}`,
+            {
+                fontSize: '18px',
+                fill: '#000000',
+                fontFamily: 'monospace',
+                fontWeight: 'bold'
+            }
+        );
+
+        // Controls header
+        this.controlsHeaderText = this.add.text(
+            GameConfig.WINDOW_WIDTH + 20,
+            80,
+            "CONTROLS:",
+            {
+                fontSize: '14px',
+                fill: '#000000',
+                fontFamily: 'monospace'
+            }
+        );
+
+        // Create pixel art A key - properly aligned
+        const keyX = GameConfig.WINDOW_WIDTH + 30;
+        const keySize = 20;
+        
+        this.aKeyBorder = this.add.rectangle(keyX, 120, keySize + 4, keySize + 4, 0x000000);
+        this.aKeyBg = this.add.rectangle(keyX, 120, keySize, keySize, 0xffffff);
+        
+        this.aKeyText = this.add.text(
+            keyX - 6,
+            112,
+            'A',
+            {
+                fontSize: '14px',
+                fill: '#000000',
+                fontFamily: 'monospace',
+                fontWeight: 'bold'
+            }
+        );
+
+        // "Move Left" text - properly aligned
+        this.moveLeftText = this.add.text(
+            keyX + 25,
+            115,
+            'Move Left',
+            {
+                fontSize: '12px',
+                fill: '#000000',
+                fontFamily: 'monospace'
+            }
+        );
+
+        // Create pixel art D key - properly aligned
+        this.dKeyBorder = this.add.rectangle(keyX, 155, keySize + 4, keySize + 4, 0x000000);
+        this.dKeyBg = this.add.rectangle(keyX, 155, keySize, keySize, 0xffffff);
+        
+        this.dKeyText = this.add.text(
+            keyX - 6,
+            147,
+            'D',
+            {
+                fontSize: '14px',
+                fill: '#000000',
+                fontFamily: 'monospace',
+                fontWeight: 'bold'
+            }
+        );
+
+        // "Move Right" text - properly aligned
+        this.moveRightText = this.add.text(
+            keyX + 25,
+            150,
+            'Move Right',
+            {
+                fontSize: '12px',
+                fill: '#000000',
+                fontFamily: 'monospace'
+            }
+        );
     }
 
     update(time, delta) {

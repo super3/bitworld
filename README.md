@@ -19,7 +19,6 @@ A 2D simulation game built with Phaser.js featuring an animated character in a m
 ## Controls
 
 - **A/D**: Move left/right
-- **ESC**: Quit
 
 ## Deployment
 

@@ -29,13 +29,4 @@ const config = {
 };
 
 // Initialize the game
-const game = new Phaser.Game(config);
-
-// Handle ESC key to quit (close window/tab)
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        if (confirm('Are you sure you want to quit?')) {
-            window.close();
-        }
-    }
-}); 
+const game = new Phaser.Game(config); 
