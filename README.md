@@ -20,6 +20,10 @@ A 2D simulation game built with Phaser.js featuring an animated character in a m
 
 - **A/D**: Move left/right
 
+## Assets
+
+This project uses the [Pixel Spaces - 2D Life-Sim/Room Building Asset Pack](https://netherzapdos.itch.io/pixel-spaces) by Netherzapdos for room building and life simulation assets.
+
 ## Deployment
 
 The game automatically deploys to GitHub Pages on push to main branch.
