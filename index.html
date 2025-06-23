@@ -21,6 +21,11 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: fit-content;
+            height: fit-content;
+        }
+        #game-container canvas {
+            display: block;
         }
     </style>
 </head>
@@ -28,6 +33,12 @@
     <div id="game-container"></div>
     <script src="js/GameConfig.js"></script>
     <script src="js/Player.js"></script>
+    <script src="js/components/PlayerSprite.js"></script>
+    <script src="js/components/Sidebar.js"></script>
+    <script src="js/managers/AnimationManager.js"></script>
+    <script src="js/managers/BuildingManager.js"></script>
+    <script src="js/managers/EnvironmentManager.js"></script>
+    <script src="js/managers/InputManager.js"></script>
     <script src="js/GameScene.js"></script>
     <script src="js/main.js"></script>
 </body>

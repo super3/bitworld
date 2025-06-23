@@ -23,269 +23,52 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Create background
-        this.add.rectangle(
-            GameConfig.WINDOW_WIDTH / 2, 
-            GameConfig.WINDOW_HEIGHT / 2, 
-            GameConfig.WINDOW_WIDTH, 
-            GameConfig.WINDOW_HEIGHT, 
-            GameConfig.BACKGROUND_COLOR
-        );
+        this.createEnvironment();
+        this.createPlayer();
+        this.createUI();
+        this.setupInput();
+    }
 
-        // Create ground
-        this.add.rectangle(
-            GameConfig.WINDOW_WIDTH / 2,
-            GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT / 2,
-            GameConfig.WINDOW_WIDTH,
-            GameConfig.GROUND_HEIGHT,
-            GameConfig.GROUND_COLOR
-        );
+    createEnvironment() {
+        this.environmentManager = new EnvironmentManager(this);
+        this.buildingManager = new BuildingManager(this);
+    }
 
-        // Create grass
-        this.add.rectangle(
-            GameConfig.WINDOW_WIDTH / 2,
-            GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - GameConfig.GRASS_HEIGHT / 2,
-            GameConfig.WINDOW_WIDTH,
-            GameConfig.GRASS_HEIGHT,
-            GameConfig.GRASS_COLOR
-        );
-
-        // Create building sprites
-        this.createBuilding();
-
-        // Initialize player
-        // Match the Python calculation exactly: WINDOW_HEIGHT - GROUND_HEIGHT - (SPRITE_HEIGHT * SCALE_FACTOR) + 15
-        // In Python this positions the sprite by top-left, but we're using bottom-center origin
-        // So we need to adjust for the difference in positioning systems
-        const pythonY = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR) + 15;
-        // Python: 600 - 13 - (32 * 2) + 15 = 600 - 13 - 64 + 15 = 538
-        // Since Python positioned by top-left and we position by bottom-center, add sprite height
-        const playerY = pythonY + (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR);
-        
+    createPlayer() {
         this.player = new Player(
-            "John", "Sim",
-            GameConfig.WINDOW_WIDTH / 2,
-            playerY
+            "John", "Sim", 
+            GameConfig.WINDOW_WIDTH / 2, 
+            this.calculatePlayerY()
         );
-
-        // Create player sprite
-        this.playerSprite = this.add.sprite(this.player.x, this.player.y, 'npc1');
-        this.playerSprite.setScale(GameConfig.SCALE_FACTOR);
-        // Set origin to center-bottom so sprite stands on the ground properly
-        this.playerSprite.setOrigin(0.5, 1);
-
+        this.playerSprite = new PlayerSprite(this, this.player);
+        
         // Create animations
-        this.createAnimations();
-
-        // Set up input
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.wasd = this.input.keyboard.addKeys('W,S,A,D');
-
-        // Create text box
-        this.createTextBox();
-
-        // Animation state
-        this.currentFrame = 0;
-        this.animationTimer = 0;
+        AnimationManager.createAnimations(this);
     }
 
-    createBuilding() {
-        const floorSprites = ['lobby', 'design1', 'design2', 'design3'];
-        const scaledWidth = GameConfig.BUILDING_WIDTH * GameConfig.BUILDING_SCALE;
-        const scaledHeight = GameConfig.BUILDING_HEIGHT * GameConfig.BUILDING_SCALE;
-        
-        // Calculate building x position (centered)
-        const buildingX = GameConfig.WINDOW_WIDTH / 2;
-
-        // Create building floors from bottom to top (excluding roof)
-        floorSprites.forEach((spriteName, index) => {
-            const yPos = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - scaledHeight * (index + 1) + scaledHeight / 2;
-            const buildingFloor = this.add.image(buildingX, yPos, spriteName);
-            buildingFloor.setScale(GameConfig.BUILDING_SCALE);
-        });
-
-        // Position roof directly on top of the highest floor (design3)
-        // Top floor center is at: WINDOW_HEIGHT - GROUND_HEIGHT - scaledHeight * 4 + scaledHeight / 2
-        // Top floor top edge is at: topFloorCenter - scaledHeight / 2 = WINDOW_HEIGHT - GROUND_HEIGHT - scaledHeight * 4
-        // Roof center should be at: topFloorTopEdge - scaledHeight / 2, but move it down a bit to close the gap
-        const roofY = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - scaledHeight * 4.3;
-        const roof = this.add.image(buildingX, roofY, 'roof');
-        roof.setScale(GameConfig.BUILDING_SCALE);
+    createUI() {
+        this.sidebar = new Sidebar(this, this.player);
     }
 
-    createAnimations() {
-        // Let's try being very conservative with frame ranges
-        // Use only frames that we're certain don't contain text
-        
-        // Now I understand! Sprite sheet is 5×3 (5 columns, 3 rows)
-        // Row 0: frames 0-4, Row 1: frames 5-9, Row 2: frames 10-14
-        
-        // Create walk animation - row 0, frames 0-3 (avoid frame 4 which has "move" text)
-        this.anims.create({
-            key: 'walk',
-            frames: this.anims.generateFrameNumbers('npc1', { 
-                start: 0, // Row 0, frame 0
-                end: 3    // Row 0, frame 3 (4 frames total, skipping frame 4)
-            }),
-            frameRate: GameConfig.WALK_ANIMATION_SPEED,
-            repeat: -1
-        });
-
-        // Create idle animation - row 1, frames 5-7 (3 frames as in Python)
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('npc1', { 
-                start: 5, // Row 1, frame 0
-                end: 7   // Row 1, frame 2 (3 frames total)
-            }),
-            frameRate: GameConfig.IDLE_ANIMATION_SPEED,
-            repeat: -1
-        });
+    setupInput() {
+        this.inputManager = new InputManager(this, this.player);
     }
 
-    createTextBox() {
-        // Create clean pixel art style background
-        this.textBoxBg = this.add.rectangle(
-            GameConfig.WINDOW_WIDTH + GameConfig.TEXT_BOX_WIDTH / 2,
-            GameConfig.WINDOW_HEIGHT / 2,
-            GameConfig.TEXT_BOX_WIDTH,
-            GameConfig.WINDOW_HEIGHT,
-            GameConfig.TEXT_BOX_COLOR
-        );
-
-        // Create a simple border line
-        this.borderLine = this.add.rectangle(
-            GameConfig.WINDOW_WIDTH,
-            GameConfig.WINDOW_HEIGHT / 2,
-            4,
-            GameConfig.WINDOW_HEIGHT,
-            0x2c3e50  // Dark blue-gray for clean separation
-        );
-
-        // Player name 
-        this.playerNameText = this.add.text(
-            GameConfig.WINDOW_WIDTH + 20,
-            30,
-            `${this.player.firstName} ${this.player.lastName}`,
-            {
-                fontSize: '18px',
-                fill: '#000000',
-                fontFamily: 'monospace',
-                fontWeight: 'bold'
-            }
-        );
-
-        // Controls header
-        this.controlsHeaderText = this.add.text(
-            GameConfig.WINDOW_WIDTH + 20,
-            80,
-            "CONTROLS:",
-            {
-                fontSize: '14px',
-                fill: '#000000',
-                fontFamily: 'monospace'
-            }
-        );
-
-        // Create pixel art A key - properly aligned
-        const keyX = GameConfig.WINDOW_WIDTH + 30;
-        const keySize = 20;
-        
-        this.aKeyBorder = this.add.rectangle(keyX, 120, keySize + 4, keySize + 4, 0x000000);
-        this.aKeyBg = this.add.rectangle(keyX, 120, keySize, keySize, 0xffffff);
-        
-        this.aKeyText = this.add.text(
-            keyX - 6,
-            112,
-            'A',
-            {
-                fontSize: '14px',
-                fill: '#000000',
-                fontFamily: 'monospace',
-                fontWeight: 'bold'
-            }
-        );
-
-        // "Move Left" text - properly aligned
-        this.moveLeftText = this.add.text(
-            keyX + 25,
-            115,
-            'Move Left',
-            {
-                fontSize: '12px',
-                fill: '#000000',
-                fontFamily: 'monospace'
-            }
-        );
-
-        // Create pixel art D key - properly aligned
-        this.dKeyBorder = this.add.rectangle(keyX, 155, keySize + 4, keySize + 4, 0x000000);
-        this.dKeyBg = this.add.rectangle(keyX, 155, keySize, keySize, 0xffffff);
-        
-        this.dKeyText = this.add.text(
-            keyX - 6,
-            147,
-            'D',
-            {
-                fontSize: '14px',
-                fill: '#000000',
-                fontFamily: 'monospace',
-                fontWeight: 'bold'
-            }
-        );
-
-        // "Move Right" text - properly aligned
-        this.moveRightText = this.add.text(
-            keyX + 25,
-            150,
-            'Move Right',
-            {
-                fontSize: '12px',
-                fill: '#000000',
-                fontFamily: 'monospace'
-            }
-        );
+    calculatePlayerY() {
+        // Match the Python calculation exactly and adjust for Phaser's coordinate system
+        const pythonY = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - 
+                       (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR) + 15;
+        return pythonY + (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR);
     }
 
     update(time, delta) {
-        this.handleInput(delta / 1000); // Convert to seconds
-        this.updatePlayerSprite();
-    }
-
-    handleInput(dt) {
-        this.player.stopWalking();
-
-        // Handle movement
-        if (this.wasd.A.isDown) {
-            this.player.move(-1, dt);
-        } else if (this.wasd.D.isDown) {
-            this.player.move(1, dt);
-        }
-
-        // Keep player within bounds
-        this.player.x = Phaser.Math.Clamp(
-            this.player.x, 
-            0, 
-            GameConfig.WINDOW_WIDTH - (GameConfig.SPRITE_WIDTH * GameConfig.SCALE_FACTOR)
-        );
-    }
-
-    updatePlayerSprite() {
-        // Update sprite position
-        this.playerSprite.setPosition(this.player.x, this.player.y);
-
-        // Update sprite direction
-        this.playerSprite.setFlipX(!this.player.facingRight);
-
-        // Update animation
-        if (this.player.isWalking) {
-            if (this.playerSprite.anims.currentAnim?.key !== 'walk') {
-                this.playerSprite.play('walk');
-            }
-        } else {
-            if (this.playerSprite.anims.currentAnim?.key !== 'idle') {
-                this.playerSprite.play('idle');
-            }
-        }
+        // Delegate to input manager
+        this.inputManager.update(delta / 1000); // Convert to seconds
+        
+        // Update player sprite
+        this.playerSprite.update();
+        
+        // Update sidebar position display
+        this.sidebar.updatePosition(Math.floor(this.player.x), Math.floor(this.player.y));
     }
 } 

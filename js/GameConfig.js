@@ -37,4 +37,53 @@ class GameConfig {
     static BUILDING_WIDTH = 288;  // Original width of building sprites
     static BUILDING_HEIGHT = 48;  // Original height of building sprites
     static BUILDING_SCALE = 2;  // Scale factor for building sprites
+
+    // Sidebar settings
+    static SIDEBAR_BORDER_WIDTH = 4;
+    static SIDEBAR_BORDER_COLOR = 0x2c3e50;
+    static SIDEBAR_MARGIN = GameConfig.WINDOW_WIDTH + 20;
+    static SIDEBAR_PLAYER_Y = 30;
+    static SIDEBAR_CONTROLS_Y = 80;
+    static SIDEBAR_KEY_A_Y = 120;
+    static SIDEBAR_KEY_D_Y = 155;
+
+    // Sidebar text styles
+    static SIDEBAR_PLAYER_STYLE = {
+        fontSize: '18px',
+        fill: '#000000',
+        fontFamily: 'monospace',
+        fontWeight: 'bold'
+    };
+
+    static SIDEBAR_HEADER_STYLE = {
+        fontSize: '14px',
+        fill: '#000000',
+        fontFamily: 'monospace'
+    };
+
+    // Sidebar key configuration
+    static SIDEBAR_KEY_CONFIG = {
+        x: GameConfig.WINDOW_WIDTH + 30,
+        size: 20,
+        borderWidth: 4,
+        borderColor: 0x000000,
+        bgColor: 0xffffff,
+        textOffset: 6,
+        labelOffset: 25,
+        textStyle: { 
+            fontSize: '14px', 
+            fill: '#000000', 
+            fontFamily: 'monospace', 
+            fontWeight: 'bold' 
+        },
+        labelStyle: { 
+            fontSize: '12px', 
+            fill: '#000000', 
+            fontFamily: 'monospace' 
+        }
+    };
+
+    // Animation frame configuration
+    static WALK_FRAMES = { start: 0, end: 3 };
+    static IDLE_FRAMES = { start: 5, end: 7 };
 } 
