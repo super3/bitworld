@@ -20,6 +20,11 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    render: {
+        pixelArt: true,           // Enable pixel-perfect rendering
+        antialias: false,         // Disable anti-aliasing
+        roundPixels: true         // Round positions to nearest pixel
     }
 };
 

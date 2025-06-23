@@ -54,15 +54,25 @@ class GameScene extends Phaser.Scene {
         this.createBuilding();
 
         // Initialize player
+        // Match the Python calculation exactly: WINDOW_HEIGHT - GROUND_HEIGHT - (SPRITE_HEIGHT * SCALE_FACTOR) + 15
+        // In Python this positions the sprite by top-left, but we're using bottom-center origin
+        // So we need to adjust for the difference in positioning systems
+        const pythonY = GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR) + 15;
+        // Python: 600 - 13 - (32 * 2) + 15 = 600 - 13 - 64 + 15 = 538
+        // Since Python positioned by top-left and we position by bottom-center, add sprite height
+        const playerY = pythonY + (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR);
+        
         this.player = new Player(
             "John", "Sim",
             GameConfig.WINDOW_WIDTH / 2,
-            GameConfig.WINDOW_HEIGHT - GameConfig.GROUND_HEIGHT - (GameConfig.SPRITE_HEIGHT * GameConfig.SCALE_FACTOR) + 15
+            playerY
         );
 
         // Create player sprite
         this.playerSprite = this.add.sprite(this.player.x, this.player.y, 'npc1');
         this.playerSprite.setScale(GameConfig.SCALE_FACTOR);
+        // Set origin to center-bottom so sprite stands on the ground properly
+        this.playerSprite.setOrigin(0.5, 1);
 
         // Create animations
         this.createAnimations();
