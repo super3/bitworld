@@ -40,7 +40,7 @@ class GameScene extends Phaser.Scene {
         this.createEnvironment();
         this.createPlayerEntities();
         this.createUI();
-        this.setupInput();
+        //this.setupInput();
 
      
         this.elevatorManager = new ElevatorManager(this, this.player);
@@ -56,8 +56,40 @@ class GameScene extends Phaser.Scene {
 
                 this.selectedPlayer = clicked ? clicked.player : null;
                 this.sidebar.updatePlayer(this.selectedPlayer);
+                console.log(this.selectedPlayer);
+                return;
+            }
+
+            const selected = this.selectedPlayer;
+            if (!selected) return;
+
+
+
+            if (this.elevatorManager.boardedPlayers.includes(selected)) return;
+
+            if(selected.inElevator) return;
+ 
+            if (selected) {
+                if(selected.elevatorClickTimer)
+                       selected.elevatorClickTimer.remove();
+
+                selected.waitingForElevator = false;
+                selected.walkingThroughDoor = false;
+            }
+
+
+            const clickedFloor = this.getClickedFloorIndex(pointer.worldY);
+            if (clickedFloor === -1) return;
+
+            if (clickedFloor !== selected.currentFloor) {
+                selected.deferredTargetX = pointer.worldX;
+                this.onElevatorZoneClicked(clickedFloor, selected);
+  
+            } else {
+                selected.targetX = pointer.worldX;
             }
         });
+
     }
 
 
@@ -160,10 +192,26 @@ createFloorWalls() {
 
 onElevatorZoneClicked(targetFloor, player) {
     if (!player) return;
+    
+    // Cancel previous pending movement
+    if (player.elevatorClickTimer) {
+        player.elevatorClickTimer.remove();
+        player.elevatorClickTimer = null;
+    }
+
+    // Case: Same floor clicked, cancel movement toward elevator
+    if (player.currentFloor === targetFloor) {
+        player.targetX = null;
+        player.vx = 0;
+        return;
+    }
+
+    // Case: Already requesting elevator (still allow override if it's a different floor)
     if (player.inElevator === true) return;
-    if (player.currentFloor === targetFloor) return;
     if (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player) return;
 
+    // Update target floor and set new targetX
+    player.targetFloor = targetFloor;
     player.targetX = this.elevator_X_position;
 
     const arrivalCheck = this.time.addEvent({
@@ -171,26 +219,32 @@ onElevatorZoneClicked(targetFloor, player) {
         loop: true,
         callback: () => {
             const dx = Math.abs(player.x - this.elevator_X_position);
-            
-            // Extra redundancy if player walks away or gets picked up
-            if (player.inElevator === true ||
-                player.currentFloor === targetFloor ||
-                (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player)) {
+
+            // Cancel if they somehow entered elevator or changed mind again
+            if (
+                player.inElevator === true ||
+                player.currentFloor === targetFloor || // Clicked current floor again mid-way
+                (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player)
+            ) {
                 arrivalCheck.remove();
+                player.elevatorClickTimer = null;
                 return;
             }
             player.targetX = this.elevator_X_position;
-            
+            // Snap to elevator and request
             if (dx < 12) {
                 player.targetX = null;
                 player.vx = 0;
                 arrivalCheck.remove();
+                player.elevatorClickTimer = null;
                 this.elevatorManager.requestElevator(player, targetFloor);
             }
-
         }
     });
+
+    player.elevatorClickTimer = arrivalCheck;
 }
+
 
 
     update(time, delta) {
@@ -216,7 +270,7 @@ onElevatorZoneClicked(targetFloor, player) {
         });
 
         this.sidebar.updatePosition();
-        this.inputManager.update(dt);
+        //this.inputManager.update(dt);
     }
 
     checkWallCollision(player, sprite)
@@ -249,4 +303,29 @@ onElevatorZoneClicked(targetFloor, player) {
         }
     });
     }
+
+getClickedFloorIndex(y) {
+    const scaledHeight = GameConfig.BUILDING_HEIGHT * GameConfig.BUILDING_SCALE;
+
+    for (let i = this.buildingManager.floors.length - 1; i >= 0; i--) {
+        const floorSprite = this.buildingManager.floors[i];
+        const fy = floorSprite.y;
+        const halfHeight = scaledHeight / 2;
+
+        const top = fy - halfHeight;
+        const bottom = fy + halfHeight;
+
+        //console.log(`Checking floor ${i}: y=${y}, top=${top}, bottom=${bottom}`);
+
+        if (y >= top && y <= bottom) {
+            //console.log(`→ Clicked floor ${i}`);
+            return i;
+        }
+    }
+
+    console.log("→ No valid floor clicked");
+    return -1;
+}
+
+
 } 
