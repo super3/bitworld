@@ -1,35 +1,38 @@
 /**
- * Input manager for handling keyboard input and player movement
+ * Input manager for handling pointer input and player movement
  */
 class InputManager {
-    constructor(scene, player) {
+    constructor(scene) {
         this.scene = scene;
-        this.player = player;
-        this.keys = scene.input.keyboard.addKeys('A,D');
+
+        // Left click = move selected player
+        this.scene.input.on('pointerdown', pointer => {
+            if (pointer.rightButtonDown()) return; // handled elsewhere for selection
+
+            const selected = this.scene.selectedPlayer;
+            
+            if (this.scene.elevatorManager.isLocked && this.scene.elevatorManager.boardedPlayers.includes(selected)) return;
+            
+            if (selected) {
+                selected.targetX = pointer.worldX;
+                selected.walkingThroughDoor = false;
+            }
+        });
     }
 
     update(dt) {
-        this.player.stopWalking();
-
-        if (this.keys.A.isDown) {
-            this.player.move(-1, dt);
-        } else if (this.keys.D.isDown) {
-            this.player.move(1, dt);
+        const selected = this.scene.selectedPlayer;
+        if (selected) {
+            // Apply constraints
+            selected.x = Phaser.Math.Clamp(
+                selected.x,
+                0,
+                GameConfig.WINDOW_WIDTH - (GameConfig.SPRITE_WIDTH * GameConfig.SCALE_FACTOR)
+            );
         }
-
-        this.constrainPlayer();
-    }
-
-    constrainPlayer() {
-        this.player.x = Phaser.Math.Clamp(
-            this.player.x, 
-            0, 
-            GameConfig.WINDOW_WIDTH - (GameConfig.SPRITE_WIDTH * GameConfig.SCALE_FACTOR)
-        );
     }
 
     destroy() {
-        // Clean up if needed
-        this.keys = null;
+        // Clean up if needed later
     }
-} 
+}

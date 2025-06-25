@@ -11,7 +11,7 @@ class Player {
      * @param {number} x - Initial x position
      * @param {number} y - Initial y position
      */
-    constructor(firstName, lastName, x, y) {
+    constructor(firstName, lastName, x, y, spriteKey, floorIndex = 0) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.x = x;
@@ -19,24 +19,40 @@ class Player {
         this.facingRight = true;  // Direction player is facing
         this.speed = GameConfig.CHAR_SPEED;
         this.isWalking = false;  // Current movement state
+        
+        this.spriteKey = spriteKey;
+        this.currentFloor = floorIndex;
+        this.vx = 0;
+        this.targetX = null;
+        this.waitingForElevator = false;
+        this.targetFloor = null;
+        this.inElevator = false;
+        this.walkingThroughDoor = false;
     }
 
-    /**
-     * Move the player in the specified direction.
-     * 
-     * @param {number} direction - -1 for left, 1 for right
-     * @param {number} dt - Delta time for frame-independent movement
-     */
-    move(direction, dt) {
-        this.isWalking = true;
-        this.facingRight = (direction > 0);
-        this.x += direction * this.speed * dt;
+
+    moveTowardTarget(dt) {
+        if (this.targetX !== null) {
+            const dx = this.targetX - this.x;
+            const dir = Math.sign(dx);
+            this.vx = dir * this.speed;
+            this.x += this.vx * dt;
+            this.isWalking = true;
+            this.facingRight = dir > 0;
+
+            if (Math.abs(dx) < 2) {
+                this.x = this.targetX;
+                this.stop();
+            }
+        } else {
+            this.vx = 0;
+            this.isWalking = false;
+        }
     }
 
-    /**
-     * Stop the player movement
-     */
-    stopWalking() {
+    stop() {
+        this.vx = 0;
+        this.targetX = null;
         this.isWalking = false;
     }
 } 
