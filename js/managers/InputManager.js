@@ -11,9 +11,13 @@ class InputManager {
 
             const selected = this.scene.selectedPlayer;
             
-            if (this.scene.elevatorManager.isLocked && this.scene.elevatorManager.boardedPlayers.includes(selected)) return;
+            if (this.scene.elevatorManager.boardedPlayers.includes(selected)) return;
             
             if (selected) {
+                if(selected.elevatorClickTimer)
+                       selected.elevatorClickTimer.remove();
+
+                selected.waitingForElevator = false;
                 selected.targetX = pointer.worldX;
                 selected.walkingThroughDoor = false;
             }
