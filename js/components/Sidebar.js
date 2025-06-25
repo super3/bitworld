@@ -39,19 +39,29 @@ class Sidebar {
     }
 
     createPlayerInfo() {
+        let nameVal = ``;
+        if(this.player != null)
+        {
+            nameVal =`${this.player.firstName} ${this.player.lastName}`
+        }
         this.playerName = this.scene.add.text(
             GameConfig.SIDEBAR_MARGIN,
             GameConfig.SIDEBAR_PLAYER_Y,
-            `${this.player.firstName} ${this.player.lastName}`,
+            nameVal,
             GameConfig.SIDEBAR_PLAYER_STYLE
         );
         this.elements.push(this.playerName);
 
         // Create position text that will be updated
+        let posVal = `Position: (-,-)`;
+        if(this.player != null)
+        {
+            posVal =`Position: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`
+        }
         this.positionText = this.scene.add.text(
             GameConfig.SIDEBAR_MARGIN,
             GameConfig.SIDEBAR_PLAYER_Y + 25,
-            `Position: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`,
+            posVal,
             {
                 fontSize: '12px',
                 fill: '#000000',
@@ -112,10 +122,35 @@ class Sidebar {
         this.elements.push(keyBorder, keyBg, keyText, labelText);
     }
 
-    updatePosition(x, y) {
+    updatePlayer(_player)
+    {
+        this.player = _player;
+        this.updateName()
+        this.updatePosition();
+    }
+
+    updatePosition() {
         if (this.positionText) {
-            this.positionText.setText(`Position: (${x}, ${y})`);
+            let posVal = `Position: (-,-)`;
+            if(this.player != null)
+            {
+                posVal =`Position: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`
+            }
+            this.positionText.setText(posVal);
         }
+    }
+
+    updateName() {
+        if(this.playerName)
+        {
+            let nameVal = ``;
+            if(this.player != null)
+            {
+                nameVal =`${this.player.firstName} ${this.player.lastName}`
+            }
+            this.playerName.setText(nameVal);
+        }
+
     }
 
     destroy() {
