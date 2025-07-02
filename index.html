@@ -546,6 +546,28 @@
         });
 
 
+        // Ensure email input can receive all keyboard events
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.querySelector('.email-input');
+            if (emailInput) {
+                // Force focus handling for email input
+                emailInput.addEventListener('focus', function(e) {
+                    e.stopPropagation();
+                    // Ensure Phaser doesn't interfere
+                    if (window.previewGame && window.previewGame.input && window.previewGame.input.keyboard) {
+                        window.previewGame.input.keyboard.enabled = false;
+                    }
+                });
+                
+                emailInput.addEventListener('blur', function(e) {
+                    // Re-enable Phaser keyboard if needed (though we don't need it for preview)
+                    if (window.previewGame && window.previewGame.input && window.previewGame.input.keyboard) {
+                        window.previewGame.input.keyboard.enabled = false; // Keep it disabled for preview
+                    }
+                });
+            }
+        });
+
         // Email form handler
         function handleEmailSubmit(event) {
             event.preventDefault();
@@ -625,16 +647,32 @@
             // Create a custom preview scene that extends GameScene
             class PreviewGameScene extends GameScene {
                 create() {
-                    // Call parent create
-                    super.create();
+                    // Call parent create but skip input setup
+                    this.createEnvironment();
+                    this.createPlayer();
+                    this.createUI();
+                    // Skip setupInput() to prevent keyboard capture
                     
                     // Adjust camera to show bottom floor
                     this.cameras.main.scrollY = 300; // Scroll down to show lobby/bottom floor
                     this.cameras.main.scrollX = 177; // Scroll right to center the building
                     
-                    // Optional: Disable player input for preview
-                    if (this.inputManager) {
-                        this.inputManager.enabled = false;
+                    // Disable keyboard plugin to prevent any key capture
+                    if (this.input.keyboard) {
+                        this.input.keyboard.enabled = false;
+                    }
+                }
+                
+                update(time, delta) {
+                    // Update everything except input
+                    const dt = delta / 1000;
+                    
+                    if (this.sidebar) {
+                        this.sidebar.updatePosition();
+                    }
+                    
+                    if (this.playerSprite) {
+                        this.playerSprite.updateAnimation();
                     }
                 }
             }
@@ -657,14 +695,39 @@
                 scene: PreviewGameScene,
                 scale: {
                     mode: Phaser.Scale.NONE
+                },
+                input: {
+                    keyboard: {
+                        capture: [] // Don't capture any keys
+                    }
                 }
             };
 
-            // Create the preview game
-            const previewGame = new Phaser.Game(previewConfig);
+            // Create the preview game and store globally for access
+            window.previewGame = new Phaser.Game(previewConfig);
             
             // Disable sound for preview
-            previewGame.sound.mute = true;
+            window.previewGame.sound.mute = true;
+            
+            // Ensure email input works properly
+            const emailInput = document.querySelector('.email-input');
+            if (emailInput) {
+                emailInput.addEventListener('focus', function(e) {
+                    // Disable Phaser keyboard when email input is focused
+                    if (window.previewGame && window.previewGame.scene.scenes[0]) {
+                        const scene = window.previewGame.scene.scenes[0];
+                        if (scene.input && scene.input.keyboard) {
+                            scene.input.keyboard.enabled = false;
+                        }
+                    }
+                    e.stopPropagation();
+                });
+                
+                emailInput.addEventListener('blur', function(e) {
+                    // Keep keyboard disabled even on blur
+                    e.stopPropagation();
+                });
+            }
         });
     </script>
 </body>
