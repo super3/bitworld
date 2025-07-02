@@ -661,6 +661,47 @@
                     if (this.input.keyboard) {
                         this.input.keyboard.enabled = false;
                     }
+                    
+                    // Create animated NPCs
+                    this.npcs = [];
+                    this.createNPCs();
+                }
+                
+                createNPCs() {
+                    // Create 2-3 NPCs with different behaviors
+                    // Use the same Y calculation as the player
+                    const groundY = 600 - 13 - (32 * 2) + 15 + (32 * 2); // Same as calculatePlayerY()
+                    
+                    const npcConfigs = [
+                        { x: 300, y: groundY, minX: 200, maxX: 400, speed: 35, sprite: 'npc1' },
+                    ];
+                    
+                    npcConfigs.forEach((config, index) => {
+                        // Create NPC object
+                        const npc = {
+                            x: config.x,
+                            y: config.y,
+                            minX: config.minX,
+                            maxX: config.maxX,
+                            speed: config.speed,
+                            direction: Math.random() > 0.5 ? 1 : -1,
+                            facingRight: config.x < (config.minX + config.maxX) / 2 ? false : true, // Face center initially,
+                            isWalking: true,
+                            idleTimer: 0,
+                            idleDuration: 2 + Math.random() * 3 // 2-5 seconds
+                        };
+                        
+                        // Create sprite
+                        const sprite = this.add.sprite(npc.x, npc.y, config.sprite);
+                        sprite.setScale(GameConfig.SCALE_FACTOR);
+                        sprite.setOrigin(0.5, 1);
+                        sprite.setFlipX(!npc.facingRight);
+                        sprite.play('walk', true);
+                        
+                        // Store reference
+                        npc.sprite = sprite;
+                        this.npcs.push(npc);
+                    });
                 }
                 
                 update(time, delta) {
@@ -674,6 +715,46 @@
                     if (this.playerSprite) {
                         this.playerSprite.updateAnimation();
                     }
+                    
+                    // Update NPCs
+                    this.updateNPCs(dt);
+                }
+                
+                updateNPCs(dt) {
+                    this.npcs.forEach(npc => {
+                        if (npc.isWalking) {
+                            // Move NPC
+                            npc.x += npc.direction * npc.speed * dt;
+                            
+                            // Check boundaries and pause
+                            if (npc.x <= npc.minX || npc.x >= npc.maxX) {
+                                npc.direction *= -1;
+                                npc.facingRight = npc.direction > 0;
+                                npc.isWalking = false;
+                                npc.idleTimer = 0;
+                                npc.sprite.play('idle', true);
+                            }
+                            
+                            // Random chance to pause
+                            if (Math.random() < 0.005) { // 0.5% chance per frame
+                                npc.isWalking = false;
+                                npc.idleTimer = 0;
+                                npc.sprite.play('idle', true);
+                            }
+                        } else {
+                            // Handle idle state
+                            npc.idleTimer += dt;
+                            if (npc.idleTimer >= npc.idleDuration) {
+                                npc.isWalking = true;
+                                npc.idleDuration = 2 + Math.random() * 3; // New random duration
+                                npc.sprite.play('walk', true);
+                            }
+                        }
+                        
+                        // Update sprite position and direction
+                        npc.sprite.setPosition(npc.x, npc.y);
+                        npc.sprite.setFlipX(!npc.facingRight);
+                    });
                 }
             }
             
