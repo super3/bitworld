@@ -46,7 +46,7 @@ class GameScene extends Phaser.Scene {
         //this.setupInput();
 
      
-        this.elevatorManager = new ElevatorManager(this, this.selectedPlayer);
+        this.elevatorManager = new ElevatorManager(this);
         this.input.on('pointerdown', (pointer) => {
             if (pointer.rightButtonDown()) {
                 const clicked = this.players.find(({ player }) => {

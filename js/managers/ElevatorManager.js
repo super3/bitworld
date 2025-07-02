@@ -1,8 +1,7 @@
 
 class ElevatorManager {
-    constructor(scene, player) {
+    constructor(scene) {
         this.scene = scene;
-        this.player = player;
         this.isLocked = false;
 
         this.elevatorZones = [];

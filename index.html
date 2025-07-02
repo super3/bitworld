@@ -641,7 +641,7 @@
                     // Skip setupInput() to prevent keyboard capture
                     
                     // Initialize elevator manager for the preview
-                    this.elevatorManager = new ElevatorManager(this, this.players[0]?.player);
+                    this.elevatorManager = new ElevatorManager(this);
                     
                     // Adjust camera to show bottom floor
                     this.cameras.main.scrollY = 300; // Scroll down to show lobby/bottom floor
