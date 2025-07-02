@@ -5,46 +5,33 @@ class PlayerSprite {
     constructor(scene, player) {
         this.scene = scene;
         this.player = player;
-        this.sprite = null;
-        this.create();
-    }
-
-    create() {
-        this.sprite = this.scene.add.sprite(this.player.x, this.player.y, 'npc1');
+        this.sprite = this.scene.add.sprite(player.x, player.y, player.spriteKey);
         this.sprite.setScale(GameConfig.SCALE_FACTOR);
-        this.sprite.setOrigin(0.5, 1); // Center-bottom origin for proper ground positioning
+        this.sprite.setOrigin(0.5, 1);
+        this.sprite.setDepth(20); // ensure it's above elevator
+        this.player.spriteRef = this.sprite;
     }
 
     update() {
-        this.updatePosition();
-        this.updateDirection();
-        this.updateAnimation();
-    }
+        const sprite = this.sprite;
+        sprite.setPosition(this.player.x, this.player.y);
+        sprite.flipX = this.player.vx < 0;
 
-    updatePosition() {
-        this.sprite.setPosition(this.player.x, this.player.y);
-    }
+        const walkKey = `walk_${this.player.spriteKey}`;
+        const idleKey = `idle_${this.player.spriteKey}`;
 
-    updateDirection() {
-        this.sprite.setFlipX(!this.player.facingRight);
-    }
-
-    updateAnimation() {
-        if (this.player.isWalking) {
-            if (this.sprite.anims.currentAnim?.key !== 'walk') {
-                this.sprite.play('walk');
+        if (this.player.vx !== 0) {
+            if (!sprite.anims.isPlaying || sprite.anims.currentAnim.key !== walkKey) {
+                sprite.anims.play(walkKey, true);
             }
         } else {
-            if (this.sprite.anims.currentAnim?.key !== 'idle') {
-                this.sprite.play('idle');
+            if (!sprite.anims.isPlaying || sprite.anims.currentAnim.key !== idleKey) {
+                sprite.anims.play(idleKey, true);
             }
         }
     }
 
     destroy() {
-        if (this.sprite) {
-            this.sprite.destroy();
-            this.sprite = null;
-        }
+        this.sprite.destroy();
     }
-} 
+}

@@ -546,27 +546,7 @@
         });
 
 
-        // Ensure email input can receive all keyboard events
-        document.addEventListener('DOMContentLoaded', function() {
-            const emailInput = document.querySelector('.email-input');
-            if (emailInput) {
-                // Force focus handling for email input
-                emailInput.addEventListener('focus', function(e) {
-                    e.stopPropagation();
-                    // Ensure Phaser doesn't interfere
-                    if (window.previewGame && window.previewGame.input && window.previewGame.input.keyboard) {
-                        window.previewGame.input.keyboard.enabled = false;
-                    }
-                });
-                
-                emailInput.addEventListener('blur', function(e) {
-                    // Re-enable Phaser keyboard if needed (though we don't need it for preview)
-                    if (window.previewGame && window.previewGame.input && window.previewGame.input.keyboard) {
-                        window.previewGame.input.keyboard.enabled = false; // Keep it disabled for preview
-                    }
-                });
-            }
-        });
+        // Note: Email input event listeners are added after game initialization in the window load event
 
         // Email form handler
         function handleEmailSubmit(event) {
@@ -639,6 +619,8 @@
     <script src="js/managers/BuildingManager.js"></script>
     <script src="js/managers/EnvironmentManager.js"></script>
     <script src="js/managers/InputManager.js"></script>
+    <script src="js/managers/ElevatorManager.js"></script>
+    <script src="js/managers/DoorManager.js"></script>
     <script src="js/GameScene.js"></script>
     
     <script>
@@ -646,12 +628,19 @@
         window.addEventListener('load', function() {
             // Create a custom preview scene that extends GameScene
             class PreviewGameScene extends GameScene {
+                preload() {
+                    super.preload(); // Call parent preload to load all assets
+                }
+                
                 create() {
                     // Call parent create but skip input setup
                     this.createEnvironment();
-                    this.createPlayer();
+                    this.createPlayerEntities(); // Use the new method name from main branch
                     this.createUI();
                     // Skip setupInput() to prevent keyboard capture
+                    
+                    // Initialize elevator manager for the preview
+                    this.elevatorManager = new ElevatorManager(this, this.players[0]?.player);
                     
                     // Adjust camera to show bottom floor
                     this.cameras.main.scrollY = 300; // Scroll down to show lobby/bottom floor
@@ -662,99 +651,81 @@
                         this.input.keyboard.enabled = false;
                     }
                     
-                    // Create animated NPCs
-                    this.npcs = [];
-                    this.createNPCs();
+                    // Disable all pointer interactions
+                    this.input.enabled = false;
+                    
+                    // Create animated NPCs behaviors
+                    this.initializeNPCBehaviors();
                 }
                 
-                createNPCs() {
-                    // Create 2-3 NPCs with different behaviors
-                    // Use the same Y calculation as the player
-                    const groundY = 600 - 13 - (32 * 2) + 15 + (32 * 2); // Same as calculatePlayerY()
-                    
-                    const npcConfigs = [
-                        { x: 300, y: groundY, minX: 200, maxX: 400, speed: 35, sprite: 'npc1' },
-                    ];
-                    
-                    npcConfigs.forEach((config, index) => {
-                        // Create NPC object
-                        const npc = {
-                            x: config.x,
-                            y: config.y,
-                            minX: config.minX,
-                            maxX: config.maxX,
-                            speed: config.speed,
-                            direction: Math.random() > 0.5 ? 1 : -1,
-                            facingRight: config.x < (config.minX + config.maxX) / 2 ? true : false, // Face center initially
-                            isWalking: true,
-                            idleTimer: 0,
-                            idleDuration: 2 + Math.random() * 3 // 2-5 seconds
-                        };
-                        
-                        // Create sprite
-                        const sprite = this.add.sprite(npc.x, npc.y, config.sprite);
-                        sprite.setScale(GameConfig.SCALE_FACTOR);
-                        sprite.setOrigin(0.5, 1);
-                        sprite.setFlipX(!npc.facingRight);
-                        sprite.play('walk', true);
-                        
-                        // Store reference
-                        npc.sprite = sprite;
-                        this.npcs.push(npc);
+                initializeNPCBehaviors() {
+                    // Set up simple automated movement for NPCs
+                    this.players.forEach(({ player, sprite }, index) => {
+                        // Only animate NPCs on floor 0 (lobby)
+                        if (player.currentFloor === 0 && index > 0) {
+                            player.minX = 200;
+                            player.maxX = 400;
+                            player.direction = Math.random() > 0.5 ? 1 : -1;
+                            player.isAutomated = true;
+                            player.idleTimer = 0;
+                            player.idleDuration = 2 + Math.random() * 3;
+                            player.targetX = player.x + (player.direction * 50);
+                        }
                     });
                 }
                 
                 update(time, delta) {
-                    // Update everything except input
+                    // Call parent update but with automated behaviors
                     const dt = delta / 1000;
                     
-                    if (this.sidebar) {
-                        this.sidebar.updatePosition();
-                    }
-                    
-                    if (this.playerSprite) {
-                        this.playerSprite.updateAnimation();
-                    }
-                    
-                    // Update NPCs
-                    this.updateNPCs(dt);
-                }
-                
-                updateNPCs(dt) {
-                    this.npcs.forEach(npc => {
-                        if (npc.isWalking) {
-                            // Move NPC
-                            npc.x += npc.direction * npc.speed * dt;
-                            
-                            // Check boundaries and pause
-                            if (npc.x <= npc.minX || npc.x >= npc.maxX) {
-                                npc.direction *= -1;
-                                npc.facingRight = npc.direction > 0;
-                                npc.isWalking = false;
-                                npc.idleTimer = 0;
-                                npc.sprite.play('idle', true);
-                            }
-                            
-                            // Random chance to pause
-                            if (Math.random() < 0.005) { // 0.5% chance per frame
-                                npc.isWalking = false;
-                                npc.idleTimer = 0;
-                                npc.sprite.play('idle', true);
+                    // Update automated NPCs
+                    this.players.forEach(({ player, sprite }) => {
+                        if (player.isAutomated) {
+                            // Simple back and forth movement
+                            if (player.targetX !== null) {
+                                player.moveTowardTarget(dt);
+                                
+                                // Check boundaries
+                                if (player.x <= player.minX || player.x >= player.maxX) {
+                                    player.direction *= -1;
+                                    player.targetX = player.x + (player.direction * 100);
+                                    player.idleTimer = 0;
+                                }
+                                
+                                // Random chance to pause
+                                if (Math.random() < 0.005) {
+                                    player.targetX = null;
+                                    player.idleTimer = 0;
+                                }
+                            } else {
+                                // Handle idle state
+                                player.idleTimer += dt;
+                                if (player.idleTimer >= player.idleDuration) {
+                                    player.idleDuration = 2 + Math.random() * 3;
+                                    player.targetX = player.x + (player.direction * (50 + Math.random() * 50));
+                                }
                             }
                         } else {
-                            // Handle idle state
-                            npc.idleTimer += dt;
-                            if (npc.idleTimer >= npc.idleDuration) {
-                                npc.isWalking = true;
-                                npc.idleDuration = 2 + Math.random() * 3; // New random duration
-                                npc.sprite.play('walk', true);
-                            }
+                            player.moveTowardTarget(dt);
                         }
                         
-                        // Update sprite position and direction
-                        npc.sprite.setPosition(npc.x, npc.y);
-                        npc.sprite.setFlipX(!npc.facingRight);
+                        this.checkWallCollision(player, sprite);
+                        sprite.update();
                     });
+                    
+                    // Update door interactions
+                    this.players.forEach(({ player, sprite }) => {
+                        const dx = player.vx;
+                        if (Math.abs(dx) > 0.1) {
+                            this.doorManager.tryOpenDoor(player, dx);
+                        }
+                        
+                        if (Math.abs(dx) < 0.1 && player.hasEnteredDoor) {
+                            player.hasEnteredDoor = false;
+                        }
+                    });
+                    
+                    this.sidebar.updatePosition();
                 }
             }
             
