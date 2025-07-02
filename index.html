@@ -685,7 +685,7 @@
                             maxX: config.maxX,
                             speed: config.speed,
                             direction: Math.random() > 0.5 ? 1 : -1,
-                            facingRight: config.x < (config.minX + config.maxX) / 2 ? false : true, // Face center initially,
+                            facingRight: config.x < (config.minX + config.maxX) / 2 ? true : false, // Face center initially
                             isWalking: true,
                             idleTimer: 0,
                             idleDuration: 2 + Math.random() * 3 // 2-5 seconds
