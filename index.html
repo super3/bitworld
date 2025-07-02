@@ -13,13 +13,13 @@
         }
 
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f39c12;
-            --dark-bg: #1a1a2e;
-            --light-bg: #16213e;
-            --text-light: #eee;
-            --text-dim: #aaa;
-            --accent: #e94560;
+            --primary-color: #2196f3;
+            --secondary-color: #f5f7fa;
+            --dark-bg: #0a0e27;
+            --light-bg: #141933;
+            --text-light: #f5f7fa;
+            --text-dim: #94a3b8;
+            --accent: #64b5f6;
         }
 
         body {
@@ -29,57 +29,6 @@
             overflow-x: hidden;
         }
 
-        /* Navigation */
-        nav {
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo img {
-            width: 32px;
-            height: 32px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
 
         /* Hero Section */
         .hero {
@@ -93,66 +42,143 @@
         }
 
         .hero-content {
-            text-align: center;
             z-index: 2;
             padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .hero-left {
+            flex: 1;
+            text-align: left;
+            padding-right: 2rem;
+        }
+
+        .game-preview {
+            flex: 0 0 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(33, 150, 243, 0.3);
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .preview-header::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #game-preview-container {
+            width: 400px;
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background: #2c3e50;
+        }
+
+        #game-preview-container canvas {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        @media (max-width: 968px) {
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .game-preview {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 400px;
+            }
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
             animation: fadeInUp 1s ease;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
         }
 
         .hero p {
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
             color: var(--text-dim);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             animation: fadeInUp 1s ease 0.2s both;
+            line-height: 1.5;
+            max-width: 500px;
         }
 
         /* Email Form */
         .email-form {
             animation: fadeInUp 1s ease 0.4s both;
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 450px;
         }
 
         .email-form h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--secondary-color);
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .form-group {
             position: relative;
             margin-bottom: 1rem;
             max-width: 450px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .email-input {
             width: 100%;
-            padding: 1rem 140px 1rem 1.5rem;
-            font-size: 1.1rem;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
+            padding: 1rem 150px 1rem 1.5rem;
+            font-size: 1rem;
+            border: 2px solid rgba(33, 150, 243, 0.5);
+            border-radius: 8px;
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-light);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             height: 56px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .email-input:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--accent);
             background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            box-shadow: 0 4px 0 0 rgba(0,0,0,0.3);
         }
 
         .email-input::placeholder {
@@ -169,35 +195,48 @@
             height: 40px;
             display: flex;
             align-items: center;
-            border-radius: 40px;
+            border-radius: 6px;
         }
 
         .btn {
             padding: 1rem 2rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
             border: none;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.2);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+            background: var(--text-light);
         }
 
         .form-group .btn-primary:hover {
+            transform: translateY(calc(-50% - 2px));
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 5px rgba(33, 150, 243, 0.2);
+        }
+
+        .form-group .btn-primary:active {
             transform: translateY(-50%);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
         }
 
         .btn-secondary {
@@ -259,11 +298,14 @@
 
         .pixel {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 8px;
+            height: 8px;
             background: var(--primary-color);
-            opacity: 0.1;
+            opacity: 0.15;
             animation: float 10s infinite;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
 
         @keyframes float {
@@ -306,17 +348,20 @@
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
             padding: 2rem;
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid rgba(33, 150, 243, 0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            border-color: rgba(100, 181, 246, 0.5);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .feature-icon {
@@ -325,43 +370,11 @@
         }
 
         .feature-card h3 {
-            color: var(--secondary-color);
+            color: var(--accent);
             margin-bottom: 1rem;
+            font-weight: 600;
         }
 
-        /* Screenshots Section */
-        .screenshots {
-            padding: 5rem 2rem;
-            background: var(--dark-bg);
-        }
-
-        .screenshot-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .screenshot {
-            flex: 1;
-            min-width: 300px;
-            max-width: 500px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
-        }
-
-        .screenshot:hover {
-            transform: scale(1.05);
-        }
-
-        .screenshot img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
 
         /* Footer */
         footer {
@@ -373,23 +386,6 @@
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .social-links a {
-            color: var(--text-dim);
-            font-size: 1.5rem;
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--primary-color);
         }
 
         /* Animations */
@@ -406,10 +402,6 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
             .hero h1 {
                 font-size: 3rem;
             }
@@ -445,40 +437,32 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="logo">
-                <img src="favicon.svg" alt="SimWorld Logo">
-                SimWorld
-            </a>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#screenshots">Screenshots</a></li>
-                <li><a href="#about">About</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <!-- Hero Section -->
     <section class="hero">
         <div class="animated-bg">
             <!-- Animated pixels will be added via JavaScript -->
         </div>
         <div class="hero-content">
-            <h1>SimWorld</h1>
-            <p>Experience life in a pixelated apartment complex</p>
-            <div class="email-form">
-                <h3>Get early access and exclusive updates</h3>
-                <form id="emailForm" onsubmit="handleEmailSubmit(event)">
-                    <div class="form-group">
-                        <input type="email" class="email-input" placeholder="Enter your email address" required>
-                        <button type="submit" class="btn btn-primary">Join Waitlist</button>
-                    </div>
-                </form>
-                <div id="formMessage" class="form-message"></div>
+            <div class="hero-left">
+                <h1>SimWorld</h1>
+                <p>A pixel life simulation where you live, explore, and make friends in a growing city.</p>
+                <div class="email-form">
+                    <h3>Early Access</h3>
+                    <form id="emailForm" onsubmit="handleEmailSubmit(event)">
+                        <div class="form-group">
+                            <input type="email" class="email-input" placeholder="Enter your email address" required>
+                            <button type="submit" class="btn btn-primary">Join Waitlist</button>
+                        </div>
+                    </form>
+                    <div id="formMessage" class="form-message"></div>
+                </div>
+            </div>
+            <div class="game-preview">
+                <div class="preview-header">LIVE CAMERA</div>
+                <div id="game-preview-container"></div>
             </div>
         </div>
     </section>
@@ -522,38 +506,12 @@
         </div>
     </section>
 
-    <!-- Screenshots Section -->
-    <section class="screenshots" id="screenshots">
-        <div class="container">
-            <h2 class="section-title">Preview</h2>
-            <div class="screenshot-container">
-                <div class="screenshot">
-                    <div style="background: #333; height: 300px; display: flex; align-items: center; justify-content: center; color: #666;">
-                        Game Screenshot 1
-                    </div>
-                </div>
-                <div class="screenshot">
-                    <div style="background: #333; height: 300px; display: flex; align-items: center; justify-content: center; color: #666;">
-                        Game Screenshot 2
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer id="about">
         <div class="footer-content">
             <h3>About SimWorld</h3>
             <p>SimWorld is a browser-based life simulation game where you control a character living in a pixelated apartment complex. Built with Phaser.js and featuring charming pixel art graphics.</p>
-            <div class="social-links">
-                <a href="https://github.com/your-username/simworld" target="_blank" title="GitHub">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
-            <p style="margin-top: 2rem; color: var(--text-dim);">&copy; 2024 SimWorld. All rights reserved.</p>
+            <p style="margin-top: 2rem; color: var(--text-dim);">&copy; 2025 SimWorld. All rights reserved.</p>
         </div>
     </footer>
 
@@ -581,22 +539,6 @@
             });
         });
 
-        // Add scroll effect to navigation
-        let lastScroll = 0;
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > 100) {
-                nav.style.background = 'rgba(26, 26, 46, 0.98)';
-                nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
-            } else {
-                nav.style.background = 'rgba(26, 26, 46, 0.95)';
-                nav.style.boxShadow = 'none';
-            }
-            
-            lastScroll = currentScroll;
-        });
 
         // Email form handler
         function handleEmailSubmit(event) {
@@ -658,6 +600,66 @@
                 formMessage.style.display = 'none';
             }, 5000);
         }
+    </script>
+    
+    <!-- Game Scripts -->
+    <script src="js/GameConfig.js"></script>
+    <script src="js/Player.js"></script>
+    <script src="js/components/PlayerSprite.js"></script>
+    <script src="js/components/Sidebar.js"></script>
+    <script src="js/managers/AnimationManager.js"></script>
+    <script src="js/managers/BuildingManager.js"></script>
+    <script src="js/managers/EnvironmentManager.js"></script>
+    <script src="js/managers/InputManager.js"></script>
+    <script src="js/GameScene.js"></script>
+    
+    <script>
+        // Initialize preview game
+        window.addEventListener('load', function() {
+            // Create a custom preview scene that extends GameScene
+            class PreviewGameScene extends GameScene {
+                create() {
+                    // Call parent create
+                    super.create();
+                    
+                    // Adjust camera to show bottom floor
+                    this.cameras.main.scrollY = 300; // Scroll down to show lobby/bottom floor
+                    this.cameras.main.scrollX = 177; // Scroll right to center the building
+                    
+                    // Optional: Disable player input for preview
+                    if (this.inputManager) {
+                        this.inputManager.enabled = false;
+                    }
+                }
+            }
+            
+            // Override config for preview
+            const previewConfig = {
+                type: Phaser.AUTO,
+                width: 400,
+                height: 300,
+                parent: 'game-preview-container',
+                backgroundColor: GameConfig.BACKGROUND_COLOR,
+                pixelArt: true,
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: { y: 0 },
+                        debug: false
+                    }
+                },
+                scene: PreviewGameScene,
+                scale: {
+                    mode: Phaser.Scale.NONE
+                }
+            };
+
+            // Create the preview game
+            const previewGame = new Phaser.Game(previewConfig);
+            
+            // Disable sound for preview
+            previewGame.sound.mute = true;
+        });
     </script>
 </body>
 </html>
