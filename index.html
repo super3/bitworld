@@ -71,14 +71,30 @@
         .preview-header {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
             margin-bottom: 1rem;
-            color: var(--accent);
             font-size: 0.9rem;
             font-weight: 600;
         }
+        
+        .preview-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .viewer-count {
+            background: rgba(33, 150, 243, 0.1);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid rgba(33, 150, 243, 0.2);
+        }
 
-        .preview-header::before {
+        .preview-header-left::before {
             content: '';
             width: 8px;
             height: 8px;
@@ -339,70 +355,8 @@
             }
         }
 
-        /* Features Section */
-        .features {
-            padding: 5rem 2rem;
-            background: var(--light-bg);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            color: var(--primary-color);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 2px solid rgba(33, 150, 243, 0.2);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            border-color: rgba(100, 181, 246, 0.5);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
 
 
-        /* Footer */
-        footer {
-            background: var(--light-bg);
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
 
         /* Animations */
         @keyframes fadeInUp {
@@ -420,13 +374,13 @@
         @media (max-width: 768px) {
             .hero {
                 padding: 1rem 0;
-                min-height: auto;
+                min-height: 100vh;
             }
             
             .hero-content {
-                min-height: auto;
+                min-height: 100vh;
                 padding-top: 2rem;
-                padding-bottom: 2rem;
+                padding-bottom: 4rem; /* Extra space for footer */
             }
             
             .hero h1 {
@@ -505,27 +459,6 @@
                 height: 32px;
                 right: 6px;
             }
-            
-            .features {
-                padding: 3rem 1rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-                margin-bottom: 2rem;
-            }
-            
-            .features-grid {
-                gap: 1rem;
-            }
-            
-            .feature-card {
-                padding: 1.5rem;
-            }
-            
-            footer {
-                padding: 2rem 1rem;
-            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
@@ -552,59 +485,19 @@
                 </div>
             </div>
             <div class="game-preview">
-                <div class="preview-header">LIVE CAMERA</div>
+                <div class="preview-header">
+                    <div class="preview-header-left">LIVE CAMERA</div>
+                    <div class="viewer-count">1 viewer</div>
+                </div>
                 <div id="game-preview-container"></div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title">Game Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🏢</div>
-                    <h3>Apartment Living</h3>
-                    <p>Navigate through a multi-story apartment building with unique floors and environments.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">👫</div>
-                    <h3>Character Selection</h3>
-                    <p>Choose from 30 unique pixelated characters to represent you in the game world.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎮</div>
-                    <h3>Simple Controls</h3>
-                    <p>Easy to learn controls - just use A and D keys to move around the building.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Pixel Art Style</h3>
-                    <p>Beautiful retro pixel art graphics that bring the apartment complex to life.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌆</div>
-                    <h3>Dynamic Environment</h3>
-                    <p>Explore different areas from the lobby to the rooftop with unique atmospheres.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Browser-Based</h3>
-                    <p>No downloads required - play directly in your web browser instantly.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="about">
-        <div class="footer-content">
-            <h3>About SimWorld</h3>
-            <p>SimWorld is a browser-based life simulation game where you control a character living in a pixelated apartment complex. Built with Phaser.js and featuring charming pixel art graphics.</p>
-            <p style="margin-top: 2rem; color: var(--text-dim);">&copy; 2025 SimWorld. All rights reserved.</p>
-        </div>
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 1rem; font-size: 0.85rem; background: transparent; z-index: 10;">
+        Made with ❤️ by <a href="https://twitter.com/super3" target="_blank" style="color: var(--accent); text-decoration: none; transition: color 0.2s ease;">super3</a>
     </footer>
+
 
     <script>
         // Create animated background pixels
