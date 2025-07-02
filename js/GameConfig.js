@@ -86,6 +86,7 @@ class GameConfig {
     // Animation frame configuration
     static WALK_FRAMES = { start: 0, end: 3 };
     static IDLE_FRAMES = { start: 5, end: 7 };
-
-    static ELEVATOR_SPEED = 1;//seconds
+    
+    // Elevator settings
+    static ELEVATOR_SPEED = 1; // seconds
 } 

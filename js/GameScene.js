@@ -46,7 +46,7 @@ class GameScene extends Phaser.Scene {
         //this.setupInput();
 
      
-        this.elevatorManager = new ElevatorManager(this, this.player);
+        this.elevatorManager = new ElevatorManager(this);
         this.input.on('pointerdown', (pointer) => {
             if (pointer.rightButtonDown()) {
                 const clicked = this.players.find(({ player }) => {
@@ -168,11 +168,20 @@ createFloorWalls() {
          { name: ['Alice2', 'Lee2'], floor: 1, sprite: 'npc2' },
     ];
 
+    // Track unique sprite keys to avoid duplicate animation creation
+    const createdAnimations = new Set();
+
     playerConfigs.forEach(cfg => {
         const y = this.getFloorY(cfg.floor);
         const player = new Player(cfg.name[0], cfg.name[1], GameConfig.WINDOW_WIDTH / 2, y, cfg.sprite, cfg.floor);
         const playerSprite = new PlayerSprite(this, player);
-        AnimationManager.createAnimations(this, cfg.sprite);
+        
+        // Only create animations once per unique sprite key
+        if (!createdAnimations.has(cfg.sprite)) {
+            AnimationManager.createAnimations(this, cfg.sprite);
+            createdAnimations.add(cfg.sprite);
+        }
+        
         this.players.push({ player, sprite: playerSprite });
     });
 

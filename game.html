@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Simworld</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            border: 2px solid #34495e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: fit-content;
+            height: fit-content;
+        }
+        #game-container canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <script src="js/GameConfig.js"></script>
+    <script src="js/Player.js"></script>
+    <script src="js/components/PlayerSprite.js"></script>
+    <script src="js/components/Sidebar.js"></script>
+    <script src="js/managers/AnimationManager.js"></script>
+    <script src="js/managers/BuildingManager.js"></script>
+    <script src="js/managers/EnvironmentManager.js"></script>
+    <script src="js/managers/InputManager.js"></script>
+    <script src="js/managers/ElevatorManager.js"></script>
+    <script src="js/managers/DoorManager.js"></script>
+    <script src="js/GameScene.js"></script>
+    <script src="js/main.js"></script>
+    <script>document.addEventListener('contextmenu', event => event.preventDefault());</script>
+</body>
+</html> 
