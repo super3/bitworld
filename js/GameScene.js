@@ -28,9 +28,12 @@ class GameScene extends Phaser.Scene {
         this.load.image('design3', 'World/apartment_design3.png');
         this.load.image('roof', 'World/apartment_roof.png');
         this.load.image('Elevator_opened', 'World/Elevator_opened.png');
+        this.load.image('Elevator_slightlyOpened', 'World/Elevator_slightlyOpened.png');
         this.load.image('Elevator_closed', 'World/Elevator_closed.png');
         this.load.image('Door_closed', 'World/Door_closed.png');
         this.load.image('Door_opened', 'World/Door_opened.png');
+        this.load.image('Door_glass_closed', 'World/Door_glass_closed.png');
+        this.load.image('Door_glass_opened', 'World/Door_glass_opened.png');
 
         this.currentFloor = 0;
         this.elevator_X_position = 250;
@@ -102,19 +105,19 @@ class GameScene extends Phaser.Scene {
 
         this.doorManager = new DoorManager(this);
 
-        this.doorManager.addDoor( 0, 180,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 0, 180,10, GameConfig.SPRITE_HEIGHT+15, "Door_glass");
 
-        this.doorManager.addDoor( 1, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 1, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 1, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 1, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 1, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 1, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
-        this.doorManager.addDoor( 2, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 2, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 2, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 2, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 2, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 2, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
-        this.doorManager.addDoor( 3, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 3, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 3, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 3, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 3, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 3, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
         
     }
@@ -162,6 +165,7 @@ createFloorWalls() {
     const playerConfigs = [
         { name: ['John', 'Sim'], floor: 3, sprite: 'npc1' },
         { name: ['Alice', 'Lee'], floor: 2, sprite: 'npc2' },
+         { name: ['Alice2', 'Lee2'], floor: 1, sprite: 'npc2' },
     ];
 
     playerConfigs.forEach(cfg => {
@@ -212,14 +216,13 @@ onElevatorZoneClicked(targetFloor, player) {
 
     // Update target floor and set new targetX
     player.targetFloor = targetFloor;
-    player.targetX = this.elevator_X_position;
+    player.targetX = this.elevator_X_position + 0;
 
     const arrivalCheck = this.time.addEvent({
         delay: 50,
         loop: true,
         callback: () => {
-            const dx = Math.abs(player.x - this.elevator_X_position);
-
+            const dx = Math.abs(player.x - (this.elevator_X_position+0));
             // Cancel if they somehow entered elevator or changed mind again
             if (
                 player.inElevator === true ||
@@ -232,7 +235,7 @@ onElevatorZoneClicked(targetFloor, player) {
             }
             player.targetX = this.elevator_X_position;
             // Snap to elevator and request
-            if (dx < 12) {
+            if (dx < 40) {
                 player.targetX = null;
                 player.vx = 0;
                 arrivalCheck.remove();

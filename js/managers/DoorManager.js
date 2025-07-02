@@ -3,15 +3,15 @@ function DoorManager(scene) {
     this.doors = [];
 }
 
-DoorManager.prototype.addDoor = function (floor, x, width = 32, height = 60) {
+DoorManager.prototype.addDoor = function (floor, x, width = 32, height = 60, doorType) {
     const y = this.scene.getFloorY(floor)- GameConfig.GROUND_HEIGHT - 4;
 
-    const closed = this.scene.add.image(x, y, 'Door_closed')
+    const closed = this.scene.add.image(x, y, doorType+'_closed')
         .setOrigin(0.5, 1)
         .setDepth(10)
         .setScale(2);
 
-    const opened = this.scene.add.image(x, y, 'Door_opened')
+    const opened = this.scene.add.image(x, y, doorType+'_opened')
         .setOrigin(0.5, 1)
         .setVisible(false)
         .setDepth(10)
@@ -51,6 +51,7 @@ DoorManager.prototype.tryOpenDoor = function (player, dx) {
     // Pause movement
     const originalTargetX = player.targetX;
     player.targetX = null;
+
     player.vx = 0;
     const directionAtStart = Math.sign(dx);
 
@@ -62,9 +63,10 @@ DoorManager.prototype.tryOpenDoor = function (player, dx) {
     door.closedSprite.setVisible(false);
     door.openedSprite.setVisible(true);
 
-    this.scene.time.delayedCall(500, () => {
+    this.scene.time.delayedCall(200, () => {
         if (originalTargetX !== null && player.walkingThroughDoor) {
             player.targetX = originalTargetX;
+
         }
     });
 
@@ -73,5 +75,6 @@ DoorManager.prototype.tryOpenDoor = function (player, dx) {
         door.closedSprite.setVisible(true);
         door.openedSprite.setVisible(false);
         player.hasEnteredDoor = false;
+        player.walkingThroughDoor = false;
     });
 };
