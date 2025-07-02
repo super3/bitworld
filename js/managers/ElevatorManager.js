@@ -17,7 +17,7 @@ class ElevatorManager {
         this.boardedPlayers = [];
         this.elevatorSprites = [];
         for (let i = 0; i < scene.buildingManager.floors.length; i++) {
-            const y = scene.getFloorY(i) - GameConfig.GROUND_HEIGHT - GameConfig.SPRITE_HEIGHT;
+            const y = scene.getFloorY(i) - GameConfig.GROUND_HEIGHT - GameConfig.SPRITE_HEIGHT + 3;
 
             const zone = scene.add.zone(elevatorX, y, 50, 50);
             zone.setInteractive();
@@ -129,14 +129,23 @@ class ElevatorManager {
                 });
                 this.boardedPlayers = this.boardedPlayers.filter(p => p.targetFloor !== floor);
 
-                this.boardPlayersAtCurrentFloor(direction);
+                const newBoarders = this.scene.players
+                    .filter(({ player }) =>
+                        player.currentFloor === floor &&
+                        player.waitingForElevator &&
+                        Math.sign(player.targetFloor - player.currentFloor) === direction
+                    )
+                    .map(({ player }) => player);
 
-                // Step 3: close doors after short delay
-                this.scene.time.delayedCall(500, () => {
-                    this.updateElevatorSprite(floor, false); // Close doors
-            
-                    this.continueElevatorTravel(originalTarget, direction);
+                this.sequentialBoarding([...newBoarders], () => {
+                    this.scene.time.delayedCall(500, () => {
+                        console.log("ON COMPLTE?");
+                     this.updateElevatorSprite(floor, false); // Close doors
+                        this.continueElevatorTravel(originalTarget, direction);
+                    });
                 });
+
+
             });
         } else {
             // No one getting on or off — continue immediately
@@ -144,6 +153,43 @@ class ElevatorManager {
             this.continueElevatorTravel(originalTarget, direction);
         }
     }
+
+    sequentialBoarding(players, onComplete) {
+        if (players.length === 0) {
+            onComplete();
+            return;
+        }
+
+      
+        const player = players.shift();
+        const targetX = this.scene.elevator_X_position;
+        player.targetX = targetX;
+
+
+        const walkInterval = this.scene.time.addEvent({
+            delay: 50,
+            loop: true,
+            callback: () => {
+   
+                const dx = targetX - player.x;
+                if (Math.abs(dx) < 2) {
+                    player.x = targetX;
+                    player.vx = 0;
+                    //player.spriteRef.setVisible(false);
+                    player.spriteRef.setDepth(0); // Behind the elevator door
+                    player.inElevator = true;
+                    player.waitingForElevator = false;
+                    this.boardedPlayers.push(player);
+                    walkInterval.remove();
+
+                    this.sequentialBoarding(players, onComplete);
+                } else {
+                    player.vx = Math.sign(dx) * player.speed;
+                }
+            }
+        });
+    }
+
 
     boardPlayersAtCurrentFloor(direction) {
         const floor = this.elevatorCurrentFloor;
@@ -164,101 +210,109 @@ class ElevatorManager {
         });
     }
 
-    continueElevatorTravel(originalTarget, direction) {
+    sequentialExiting(players, floor, onComplete) {
+    if (players.length === 0) {
+        onComplete();
+        return;
+    }
 
-    let  stepsRemaining = Math.abs(originalTarget - this.elevatorCurrentFloor);
-        let stepsTaken = 0;
+    const player = players.shift();
 
-        const stepTimer = this.scene.time.addEvent({
-            delay: 1000,
-            loop: true,
-            callback: () => {
-                this.elevatorCurrentFloor += direction;
-                const floor = this.elevatorCurrentFloor;
+    const walkInterval = this.scene.time.addEvent({
+        delay: 200,
+        loop: true,
+        callback: () => {
+            player.y = this.scene.getFloorY(floor);
+            player.currentFloor = floor;
+            player.targetFloor = null;
+            player.waitingForElevator = false;
+            player.inElevator = false;
+            //player.spriteRef.setVisible(true);
+            player.spriteRef.setDepth(10); // Return to default front layer
+            if (player.deferredTargetX !== undefined) {
+                player.targetX = player.deferredTargetX;
+                delete player.deferredTargetX;
+            }
+            walkInterval.remove();
+            this.sequentialExiting(players, floor, onComplete);
+   
+        }
+    });
+}
 
-                const exiting = this.boardedPlayers.filter(p => p.targetFloor === floor);
-                this.boardedPlayers = this.boardedPlayers.filter(p => p.targetFloor !== floor);
-                exiting.forEach(player => {
-                    player.currentFloor = floor;
-                    player.y = this.scene.getFloorY(floor);
-                    player.targetFloor = null;
-                    player.waitingForElevator = false;
-                    player.inElevator = false;
-                    player.spriteRef.setVisible(true);
-                    if (player.deferredTargetX !== undefined) {
-                        player.targetX = player.deferredTargetX;
-                        delete player.deferredTargetX;
-                    }
-        
-                });
-                
+continueElevatorTravel(originalTarget, direction) {
+    let stepsRemaining = Math.abs(originalTarget - this.elevatorCurrentFloor);
 
-                // Check for new boarders BEFORE delay
-                const newBoarders = this.scene.players
-                    .filter(({ player }) =>
-                        player.currentFloor === floor &&
-                        player.waitingForElevator &&
-                        Math.sign(player.targetFloor - player.currentFloor) === direction
-                    )
-                    .map(({ player }) => player);
+    const step = () => {
+        if (stepsRemaining <= 0) {
+            this.isLocked = false;
+            this.activeRequest = null;
 
-                const hasActivity = exiting.length > 0 || newBoarders.length > 0;
-
-                if (hasActivity) {
-                    this.updateElevatorSprite(floor, true); // Open doors
-
-                    this.scene.time.delayedCall(300, () => {
-                        // Board new players after brief delay
-                        newBoarders.forEach(player => {
-                            player.spriteRef.setVisible(false);
-                            player.inElevator = true;
-                            player.waitingForElevator = false;
-                            this.boardedPlayers.push(player);
-                        });
-
-                        this.scene.time.delayedCall(500, () => {
-                            this.updateElevatorSprite(floor, false); // Close doors
-                        });
-                    });
-                }
-
-                stepsTaken++;
-
-                if (stepsTaken >= stepsRemaining) {
-                    this.updateElevatorSprite(floor, true); // Final open
-
-                    stepTimer.remove();
-                    this.isLocked = false;
-                    this.activeRequest = null;
-
-                    // Check if any passengers onboard still need to go somewhere
-                    const remainingPassenger = this.boardedPlayers.find(p => p.targetFloor != null);
-                    if (remainingPassenger) {
-                        // Assign them as the new active request
-                        this.activeRequest = {
-                            player: remainingPassenger,
-                            targetFloor: remainingPassenger.targetFloor
-                        };
-                        this.processQueue();
-                    } else {
-                        //  If no one is left onboard, check for any players still waiting for pickup
-                        const next = this.scene.players.find(({ player }) => player.waitingForElevator);
-                        if (next) {
-                            this.activeRequest = {
-                                player: next.player,
-                                targetFloor: next.player.targetFloor
-                            };
-                            this.processQueue();
-                        }
-                    }
-
-                    this.scene.time.delayedCall(500, () => {
-                        this.updateElevatorSprite(floor, false); // Final close
-                    });
+            const remainingPassenger = this.boardedPlayers.find(p => p.targetFloor != null);
+            if (remainingPassenger) {
+                this.activeRequest = {
+                    player: remainingPassenger,
+                    targetFloor: remainingPassenger.targetFloor
+                };
+                this.processQueue();
+            } else {
+                const next = this.scene.players.find(({ player }) => player.waitingForElevator);
+                if (next) {
+                    this.activeRequest = {
+                        player: next.player,
+                        targetFloor: next.player.targetFloor
+                    };
+                    this.processQueue();
+                } else {
+                    this.updateElevatorSprite(this.elevatorCurrentFloor, false); // Close doors
                 }
             }
-        });
-    }
+            return;
+        }
+
+        this.elevatorCurrentFloor += direction;
+        const floor = this.elevatorCurrentFloor;
+        const newY = this.scene.getFloorY(floor);
+        this.boardedPlayers.forEach(p => p.y = newY);
+
+        const exiting = this.boardedPlayers.filter(p => p.targetFloor === floor);
+        this.boardedPlayers = this.boardedPlayers.filter(p => p.targetFloor !== floor);
+
+        const newBoarders = this.scene.players
+            .filter(({ player }) =>
+                player.currentFloor === floor &&
+                player.waitingForElevator &&
+                Math.sign(player.targetFloor - player.currentFloor) === direction
+            )
+            .map(({ player }) => player);
+
+        const hasActivity = exiting.length > 0 || newBoarders.length > 0;
+
+        if (hasActivity) {
+            this.updateElevatorSprite(floor, true); // Open doors
+
+            this.scene.time.delayedCall(100, () => {
+                this.sequentialExiting([...exiting], floor, () => {
+                    this.scene.time.delayedCall(300, () => {
+                        this.sequentialBoarding([...newBoarders], () => {
+                            this.scene.time.delayedCall(400, () => {
+                                this.updateElevatorSprite(floor, false); // Close doors
+                                stepsRemaining--;
+                                this.scene.time.delayedCall(200, step); // Call next step after short pause
+                            });
+                        });
+                    });
+                });
+            });
+        } else {
+            // No one getting on/off, just move on
+            stepsRemaining--;
+            this.scene.time.delayedCall(1000, step);
+        }
+    };
+
+    step(); // Start the loop
+}
 
 
     updateZoneGraphics(currentFloor) {
@@ -279,15 +333,24 @@ class ElevatorManager {
         });
     }
 
-    updateElevatorSprite(floorIndex, isOpen) {
-        const sprite = this.elevatorSprites[floorIndex];
-        if (!sprite) return;
+updateElevatorSprite(floorIndex, isOpen) {
+    const sprite = this.elevatorSprites[floorIndex];
+    if (!sprite) return;
 
-        const textureKey = isOpen ? 'Elevator_opened' : 'Elevator_closed';
-        if (this.currentDoorState[floorIndex] !== (isOpen ? 'open' : 'closed')) {
-            sprite.setTexture(textureKey);
-            this.currentDoorState[floorIndex] = isOpen ? 'open' : 'closed';
-        }
-    }
+    const desiredState = isOpen ? 'open' : 'closed';
+    if (this.currentDoorState[floorIndex] === desiredState) return;
+
+    // Step 1: transition to slightly opened first
+    sprite.setTexture('Elevator_slightlyOpened');
+    this.currentDoorState[floorIndex] = 'slightly';
+
+    this.scene.time.delayedCall(150, () => {
+        // Step 2: finish to fully opened or closed
+        const finalKey = isOpen ? 'Elevator_opened' : 'Elevator_closed';
+        sprite.setTexture(finalKey);
+        this.currentDoorState[floorIndex] = desiredState;
+    });
+}
+
 
 }

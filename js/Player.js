@@ -24,7 +24,7 @@ class Player {
         this.currentFloor = floorIndex;
         this.vx = 0;
         this.targetX = null;
-        this.defferedTargetX = null;
+        this.deferredTargetX = null;
         this.waitingForElevator = false;
         this.targetFloor = null;
         this.inElevator = false;
