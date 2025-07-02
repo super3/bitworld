@@ -154,7 +154,7 @@
 
         .hero h1 {
             font-size: clamp(2.5rem, 5vw, 4rem);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem; /* Consistent margin */
             color: var(--text-light);
             animation: fadeInUp 1s ease;
             font-weight: 800;
@@ -165,7 +165,7 @@
         .hero p {
             font-size: clamp(1.1rem, 2vw, 1.3rem);
             color: var(--text-dim);
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem; /* Consistent margin */
             animation: fadeInUp 1s ease 0.2s both;
             line-height: 1.5;
             max-width: 500px;
@@ -179,7 +179,7 @@
 
         .email-form h3 {
             font-size: 1rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem; /* Consistent with other headings */
             color: var(--accent);
             font-weight: 500;
             text-transform: uppercase;
@@ -379,17 +379,22 @@
             
             .hero-content {
                 min-height: 100vh;
-                padding-top: 2rem;
-                padding-bottom: 4rem; /* Extra space for footer */
+                padding: 2rem 1rem 5rem; /* Consistent padding, extra space for footer */
+                gap: 2.5rem; /* Consistent gap between elements */
             }
             
             .hero h1 {
                 font-size: 2.5rem;
+                margin-bottom: 1rem; /* Consistent margin */
             }
             
             .hero p {
                 font-size: 1.1rem;
                 margin: 0 auto 2rem auto;
+            }
+            
+            .email-form h3 {
+                margin-bottom: 1rem; /* Consistent with h1 margin */
             }
             
             .game-preview {
@@ -415,12 +420,32 @@
         }
         
         @media (max-width: 480px) {
+            .hero {
+                padding: 1.5rem 0; /* More consistent top/bottom padding */
+            }
+            
+            .hero-content {
+                padding: 1.5rem 1rem 5rem; /* Consistent with larger padding */
+                gap: 2rem; /* Slightly smaller gap for smallest screens */
+            }
+            
             .hero h1 {
                 font-size: 2rem;
+                margin-bottom: 0.75rem; /* Proportional margin */
             }
             
             .hero p {
                 font-size: 1rem;
+                margin-bottom: 1.5rem; /* Consistent spacing before form */
+            }
+            
+            .email-form {
+                margin-bottom: 0; /* Remove extra margin */
+            }
+            
+            .email-form h3 {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem; /* Match h1 proportion */
             }
             
             .game-preview {
@@ -439,12 +464,9 @@
                 margin-bottom: 0.5rem;
             }
             
-            .email-form h3 {
-                font-size: 0.9rem;
-            }
-            
             .form-group {
                 max-width: 100%;
+                margin-bottom: 0.75rem; /* Consistent with other margins */
             }
             
             .email-input {
