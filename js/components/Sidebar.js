@@ -68,7 +68,6 @@ class Sidebar {
                 fontFamily: 'monospace'
             }
         );
-        this.positionText.setStyle({ textDecoration: 'none' });
         this.elements.push(this.positionText);
     }
 
