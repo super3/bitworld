@@ -28,9 +28,13 @@ class GameScene extends Phaser.Scene {
         this.load.image('design3', 'World/apartment_design3.png');
         this.load.image('roof', 'World/apartment_roof.png');
         this.load.image('Elevator_opened', 'World/Elevator_opened.png');
+        this.load.image('Elevator_slightlyOpened', 'World/Elevator_slightlyOpened.png');
         this.load.image('Elevator_closed', 'World/Elevator_closed.png');
+        this.load.image('Elevator_light', 'World/Elevator_light.png');
         this.load.image('Door_closed', 'World/Door_closed.png');
         this.load.image('Door_opened', 'World/Door_opened.png');
+        this.load.image('Door_glass_closed', 'World/Door_glass_closed.png');
+        this.load.image('Door_glass_opened', 'World/Door_glass_opened.png');
 
         this.currentFloor = 0;
         this.elevator_X_position = 250;
@@ -40,7 +44,7 @@ class GameScene extends Phaser.Scene {
         this.createEnvironment();
         this.createPlayerEntities();
         this.createUI();
-        this.setupInput();
+        //this.setupInput();
 
      
         this.elevatorManager = new ElevatorManager(this, this.player);
@@ -56,8 +60,40 @@ class GameScene extends Phaser.Scene {
 
                 this.selectedPlayer = clicked ? clicked.player : null;
                 this.sidebar.updatePlayer(this.selectedPlayer);
+                console.log(this.selectedPlayer);
+                return;
+            }
+
+            const selected = this.selectedPlayer;
+            if (!selected) return;
+
+
+
+            if (this.elevatorManager.boardedPlayers.includes(selected)) return;
+
+            if(selected.inElevator) return;
+ 
+            if (selected) {
+                if(selected.elevatorClickTimer)
+                       selected.elevatorClickTimer.remove();
+
+                selected.waitingForElevator = false;
+                selected.walkingThroughDoor = false;
+            }
+
+
+            const clickedFloor = this.getClickedFloorIndex(pointer.worldY);
+            if (clickedFloor === -1) return;
+
+            if (clickedFloor !== selected.currentFloor) {
+                selected.deferredTargetX = pointer.worldX;
+                this.onElevatorZoneClicked(clickedFloor, selected);
+  
+            } else {
+                selected.targetX = pointer.worldX;
             }
         });
+
     }
 
 
@@ -70,19 +106,19 @@ class GameScene extends Phaser.Scene {
 
         this.doorManager = new DoorManager(this);
 
-        this.doorManager.addDoor( 0, 180,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 0, 180,10, GameConfig.SPRITE_HEIGHT+15, "Door_glass");
 
-        this.doorManager.addDoor( 1, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 1, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 1, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 1, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 1, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 1, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
-        this.doorManager.addDoor( 2, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 2, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 2, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 2, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 2, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 2, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
-        this.doorManager.addDoor( 3, 532,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 3, 436,10, GameConfig.SPRITE_HEIGHT+15);
-        this.doorManager.addDoor( 3, 308,10, GameConfig.SPRITE_HEIGHT+15);
+        this.doorManager.addDoor( 3, 532,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 3, 436,10, GameConfig.SPRITE_HEIGHT+15,"Door");
+        this.doorManager.addDoor( 3, 308,10, GameConfig.SPRITE_HEIGHT+15,"Door");
 
         
     }
@@ -130,6 +166,7 @@ createFloorWalls() {
     const playerConfigs = [
         { name: ['John', 'Sim'], floor: 3, sprite: 'npc1' },
         { name: ['Alice', 'Lee'], floor: 2, sprite: 'npc2' },
+         { name: ['Alice2', 'Lee2'], floor: 1, sprite: 'npc2' },
     ];
 
     playerConfigs.forEach(cfg => {
@@ -160,37 +197,58 @@ createFloorWalls() {
 
 onElevatorZoneClicked(targetFloor, player) {
     if (!player) return;
+    
+    // Cancel previous pending movement
+    if (player.elevatorClickTimer) {
+        player.elevatorClickTimer.remove();
+        player.elevatorClickTimer = null;
+    }
+
+    // Case: Same floor clicked, cancel movement toward elevator
+    if (player.currentFloor === targetFloor) {
+        player.targetX = null;
+        player.vx = 0;
+        return;
+    }
+
+    // Case: Already requesting elevator (still allow override if it's a different floor)
     if (player.inElevator === true) return;
-    if (player.currentFloor === targetFloor) return;
     if (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player) return;
 
-    player.targetX = this.elevator_X_position;
+    // Update target floor and set new targetX
+    player.targetFloor = targetFloor;
+    player.targetX = this.elevator_X_position + 0;
 
     const arrivalCheck = this.time.addEvent({
         delay: 50,
         loop: true,
         callback: () => {
-            const dx = Math.abs(player.x - this.elevator_X_position);
-            
-            // Extra redundancy if player walks away or gets picked up
-            if (player.inElevator === true ||
-                player.currentFloor === targetFloor ||
-                (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player)) {
+            const dx = Math.abs(player.x - (this.elevator_X_position+0));
+            // Cancel if they somehow entered elevator or changed mind again
+            if (
+                player.inElevator === true ||
+                player.currentFloor === targetFloor || // Clicked current floor again mid-way
+                (this.elevatorManager.activeRequest && this.elevatorManager.activeRequest.player === player)
+            ) {
                 arrivalCheck.remove();
+                player.elevatorClickTimer = null;
                 return;
             }
             player.targetX = this.elevator_X_position;
-            
-            if (dx < 12) {
+            // Snap to elevator and request
+            if (dx < 40) {
                 player.targetX = null;
                 player.vx = 0;
                 arrivalCheck.remove();
+                player.elevatorClickTimer = null;
                 this.elevatorManager.requestElevator(player, targetFloor);
             }
-
         }
     });
+
+    player.elevatorClickTimer = arrivalCheck;
 }
+
 
 
     update(time, delta) {
@@ -216,7 +274,7 @@ onElevatorZoneClicked(targetFloor, player) {
         });
 
         this.sidebar.updatePosition();
-        this.inputManager.update(dt);
+        //this.inputManager.update(dt);
     }
 
     checkWallCollision(player, sprite)
@@ -249,4 +307,29 @@ onElevatorZoneClicked(targetFloor, player) {
         }
     });
     }
+
+getClickedFloorIndex(y) {
+    const scaledHeight = GameConfig.BUILDING_HEIGHT * GameConfig.BUILDING_SCALE;
+
+    for (let i = this.buildingManager.floors.length - 1; i >= 0; i--) {
+        const floorSprite = this.buildingManager.floors[i];
+        const fy = floorSprite.y;
+        const halfHeight = scaledHeight / 2;
+
+        const top = fy - halfHeight;
+        const bottom = fy + halfHeight;
+
+        //console.log(`Checking floor ${i}: y=${y}, top=${top}, bottom=${bottom}`);
+
+        if (y >= top && y <= bottom) {
+            //console.log(`→ Clicked floor ${i}`);
+            return i;
+        }
+    }
+
+    console.log("→ No valid floor clicked");
+    return -1;
+}
+
+
 } 

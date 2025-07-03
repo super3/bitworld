@@ -24,10 +24,12 @@ class Player {
         this.currentFloor = floorIndex;
         this.vx = 0;
         this.targetX = null;
+        this.deferredTargetX = null;
         this.waitingForElevator = false;
         this.targetFloor = null;
         this.inElevator = false;
         this.walkingThroughDoor = false;
+        this.elevatorClickTimer  = null;
     }
 
 
