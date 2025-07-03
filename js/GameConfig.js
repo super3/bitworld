@@ -60,8 +60,8 @@ class GameConfig {
     };
 
     static SIDEBAR_CONTROLS_STYLE = {
-        fontSize: '12px',
-        fill: '#000000',
+        fontSize: '11px',
+        fill: '#2c3e50',
         fontFamily: 'monospace'
     };
 

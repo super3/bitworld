@@ -68,6 +68,7 @@ class Sidebar {
                 fontFamily: 'monospace'
             }
         );
+        this.positionText.setStyle({ textDecoration: 'none' });
         this.elements.push(this.positionText);
     }
 
@@ -81,14 +82,45 @@ class Sidebar {
         );
         this.elements.push(this.controlsHeader);
 
-        // Create controls text
-        this.controlsText = this.scene.add.text(
-            GameConfig.SIDEBAR_MARGIN,
-            GameConfig.SIDEBAR_CONTROLS_Y + 30,
-            "Left Click: Move Player\nRight Click: Select Player",
+        // Create mouse icon with controls
+        const controlsY = GameConfig.SIDEBAR_CONTROLS_Y + 25;
+        
+        // Left click control
+        this.leftClickIcon = this.scene.add.graphics();
+        this.leftClickIcon.fillStyle(0x000000, 1);
+        this.leftClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, controlsY, 18, 20, 3);
+        this.leftClickIcon.fillStyle(0xffffff, 1);
+        this.leftClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
+        this.leftClickIcon.lineStyle(1, 0x000000, 1);
+        this.leftClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
+        this.elements.push(this.leftClickIcon);
+        
+        this.leftClickText = this.scene.add.text(
+            GameConfig.SIDEBAR_MARGIN + 25,
+            controlsY + 2,
+            "Move Player",
             GameConfig.SIDEBAR_CONTROLS_STYLE
         );
-        this.elements.push(this.controlsText);
+        this.elements.push(this.leftClickText);
+        
+        // Right click control
+        const rightClickY = controlsY + 30;
+        this.rightClickIcon = this.scene.add.graphics();
+        this.rightClickIcon.fillStyle(0x000000, 1);
+        this.rightClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, rightClickY, 18, 20, 3);
+        this.rightClickIcon.fillStyle(0xffffff, 1);
+        this.rightClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
+        this.rightClickIcon.lineStyle(1, 0x000000, 1);
+        this.rightClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
+        this.elements.push(this.rightClickIcon);
+        
+        this.rightClickText = this.scene.add.text(
+            GameConfig.SIDEBAR_MARGIN + 25,
+            rightClickY + 2,
+            "Select Player",
+            GameConfig.SIDEBAR_CONTROLS_STYLE
+        );
+        this.elements.push(this.rightClickText);
     }
 
 
