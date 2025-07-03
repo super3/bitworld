@@ -370,6 +370,16 @@
             }
         }
 
+        /* Footer */
+        .site-footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            background: var(--dark-bg);
+            border-top: 1px solid rgba(33, 150, 243, 0.1);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero {
@@ -379,7 +389,7 @@
             
             .hero-content {
                 min-height: 100vh;
-                padding: 2rem 1rem 5rem; /* Consistent padding, extra space for footer */
+                padding: 2rem 1rem; /* Consistent padding */
                 gap: 2.5rem; /* Consistent gap between elements */
             }
             
@@ -425,7 +435,7 @@
             }
             
             .hero-content {
-                padding: 1.5rem 1rem 5rem; /* Consistent with larger padding */
+                padding: 1.5rem 1rem; /* Consistent with larger padding */
                 gap: 2rem; /* Slightly smaller gap for smallest screens */
             }
             
@@ -516,8 +526,8 @@
         </div>
     </section>
 
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 1rem; font-size: 0.85rem; background: transparent; z-index: 10;">
-        Made with ❤️ by <a href="https://twitter.com/super3" target="_blank" style="color: var(--accent); text-decoration: none; transition: color 0.2s ease;">super3</a>
+    <footer class="site-footer">
+        made with &lt;3
     </footer>
 
 
