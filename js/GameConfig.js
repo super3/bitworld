@@ -70,5 +70,5 @@ class GameConfig {
     static IDLE_FRAMES = { start: 5, end: 7 };
     
     // Elevator settings
-    static ELEVATOR_SPEED = 1; // seconds
+    static ELEVATOR_SPEED = 1500; // milliseconds
 } 
