@@ -90,19 +90,24 @@ class ElevatorManager {
 
         this.elevatorLightFlicker(0);
         const timer = this.scene.time.addEvent({
-            delay: 1500,
+            delay: GameConfig.ELEVATOR_SPEED,
             repeat: steps,
             callback: () => {
                 this.elevatorCurrentFloor += direction;
-                 this.scene.time.delayedCall(500, () => {
-                    if(this.elevatorCurrentFloor != targetFloor)
+                count++;
+                
+                // Only flicker light off if not at target floor yet
+                if (count < steps) {
+                    this.scene.time.delayedCall(500, () => {
                         this.elevatorLightFlicker(0);
-                 });
+                    });
+                }
+                
                 // Move elevator light to match new floor
                 const newY = this.scene.getFloorY(this.elevatorCurrentFloor);                                
                 this.elevatorLight.y = newY - GameConfig.GROUND_HEIGHT - GameConfig.SPRITE_HEIGHT + 3+25;
                 this.elevatorLightFlicker(1);
-                count++;
+                
                 if (count === steps) {
                     timer.remove();
                     onArriveCallback();
@@ -313,7 +318,7 @@ continueElevatorTravel(originalTarget, direction) {
         } else {
             // No one getting on/off, just move on
             stepsRemaining--;
-            this.scene.time.delayedCall(1500, step);
+            this.scene.time.delayedCall(GameConfig.ELEVATOR_SPEED, step);
         }
     };
 
