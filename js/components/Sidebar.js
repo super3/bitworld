@@ -81,46 +81,17 @@ class Sidebar {
         );
         this.elements.push(this.controlsHeader);
 
-        // Create key controls
-        this.createKeyControl('A', 'Move Left', GameConfig.SIDEBAR_KEY_A_Y);
-        this.createKeyControl('D', 'Move Right', GameConfig.SIDEBAR_KEY_D_Y);
+        // Create controls text
+        this.controlsText = this.scene.add.text(
+            GameConfig.SIDEBAR_MARGIN,
+            GameConfig.SIDEBAR_CONTROLS_Y + 30,
+            "Left Click: Move Player\nRight Click: Select Player",
+            GameConfig.SIDEBAR_CONTROLS_STYLE
+        );
+        this.elements.push(this.controlsText);
     }
 
-    createKeyControl(key, label, y) {
-        const keyConfig = GameConfig.SIDEBAR_KEY_CONFIG;
-        
-        // Key background and border
-        const keyBorder = this.scene.add.rectangle(
-            keyConfig.x, y, 
-            keyConfig.size + keyConfig.borderWidth, 
-            keyConfig.size + keyConfig.borderWidth, 
-            keyConfig.borderColor
-        );
-        
-        const keyBg = this.scene.add.rectangle(
-            keyConfig.x, y, 
-            keyConfig.size, keyConfig.size, 
-            keyConfig.bgColor
-        );
 
-        // Key letter
-        const keyText = this.scene.add.text(
-            keyConfig.x - keyConfig.textOffset, 
-            y - keyConfig.textOffset, 
-            key, 
-            keyConfig.textStyle
-        );
-
-        // Label
-        const labelText = this.scene.add.text(
-            keyConfig.x + keyConfig.labelOffset, 
-            y - keyConfig.textOffset, 
-            label, 
-            keyConfig.labelStyle
-        );
-
-        this.elements.push(keyBorder, keyBg, keyText, labelText);
-    }
 
     updatePlayer(_player)
     {

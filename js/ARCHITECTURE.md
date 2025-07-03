@@ -23,7 +23,7 @@ The game has been refactored from a single monolithic `GameScene.js` file into a
 - **`managers/AnimationManager.js`** - Static class for creating and managing Phaser animations
 - **`managers/BuildingManager.js`** - Handles building/environment sprite creation and positioning
 - **`managers/EnvironmentManager.js`** - Creates background, ground, and sky elements
-- **`managers/InputManager.js`** - Processes keyboard input and updates player state
+- **`managers/InputManager.js`** - Processes pointer input and updates player state
 
 ## Data Flow
 
@@ -38,7 +38,7 @@ main.js → GameScene → Managers/Components → Player/GameConfig
    - `PlayerSprite` creates player sprite with proper positioning
    - `AnimationManager` sets up sprite animations
    - `Sidebar` creates UI elements
-   - `InputManager` sets up keyboard controls
+   - `InputManager` sets up pointer controls
 
 3. **Game Loop**: `GameScene.update()` delegates to:
    - `InputManager.update()` processes input and updates player
@@ -79,7 +79,7 @@ main.js → GameScene → Managers/Components → Player/GameConfig
 - Updates position display in real-time
 
 ### InputManager
-- Processes A/D key input
+- Processes pointer input for player movement
 - Updates player movement state
 - Maintains boundary constraints
 - Updates sprite animations based on movement
