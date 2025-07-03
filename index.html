@@ -660,73 +660,13 @@
                 }
                 
                 initializeNPCBehaviors() {
-                    // Set up simple automated movement for NPCs
-                    this.players.forEach(({ player, sprite }, index) => {
-                        // Only animate NPCs on floor 0 (lobby)
-                        if (player.currentFloor === 0 && index > 0) {
-                            player.minX = 200;
-                            player.maxX = 400;
-                            player.direction = Math.random() > 0.5 ? 1 : -1;
-                            player.isAutomated = true;
-                            player.idleTimer = 0;
-                            player.idleDuration = 2 + Math.random() * 3;
-                            player.targetX = player.x + (player.direction * 50);
-                        }
-                    });
+                    // Use the same automated behavior system as the main game
+                    super.initializeNPCBehaviors(); // Call the parent method we just implemented
                 }
                 
                 update(time, delta) {
-                    // Call parent update but with automated behaviors
-                    const dt = delta / 1000;
-                    
-                    // Update automated NPCs
-                    this.players.forEach(({ player, sprite }) => {
-                        if (player.isAutomated) {
-                            // Simple back and forth movement
-                            if (player.targetX !== null) {
-                                player.moveTowardTarget(dt);
-                                
-                                // Check boundaries
-                                if (player.x <= player.minX || player.x >= player.maxX) {
-                                    player.direction *= -1;
-                                    player.targetX = player.x + (player.direction * 100);
-                                    player.idleTimer = 0;
-                                }
-                                
-                                // Random chance to pause
-                                if (Math.random() < 0.005) {
-                                    player.targetX = null;
-                                    player.idleTimer = 0;
-                                }
-                            } else {
-                                // Handle idle state
-                                player.idleTimer += dt;
-                                if (player.idleTimer >= player.idleDuration) {
-                                    player.idleDuration = 2 + Math.random() * 3;
-                                    player.targetX = player.x + (player.direction * (50 + Math.random() * 50));
-                                }
-                            }
-                        } else {
-                            player.moveTowardTarget(dt);
-                        }
-                        
-                        this.checkWallCollision(player, sprite);
-                        sprite.update();
-                    });
-                    
-                    // Update door interactions
-                    this.players.forEach(({ player, sprite }) => {
-                        const dx = player.vx;
-                        if (Math.abs(dx) > 0.1) {
-                            this.doorManager.tryOpenDoor(player, dx);
-                        }
-                        
-                        if (Math.abs(dx) < 0.1 && player.hasEnteredDoor) {
-                            player.hasEnteredDoor = false;
-                        }
-                    });
-                    
-                    this.sidebar.updatePosition();
+                    // Use the parent update method with full automated behavior system
+                    super.update(time, delta);
                 }
             }
             
