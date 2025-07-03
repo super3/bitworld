@@ -44,8 +44,6 @@ class GameConfig {
     static SIDEBAR_MARGIN = GameConfig.WINDOW_WIDTH + 20;
     static SIDEBAR_PLAYER_Y = 30;
     static SIDEBAR_CONTROLS_Y = 80;
-    static SIDEBAR_KEY_A_Y = 120;
-    static SIDEBAR_KEY_D_Y = 155;
 
     // Sidebar text styles
     static SIDEBAR_PLAYER_STYLE = {
@@ -61,26 +59,10 @@ class GameConfig {
         fontFamily: 'monospace'
     };
 
-    // Sidebar key configuration
-    static SIDEBAR_KEY_CONFIG = {
-        x: GameConfig.WINDOW_WIDTH + 30,
-        size: 20,
-        borderWidth: 4,
-        borderColor: 0x000000,
-        bgColor: 0xffffff,
-        textOffset: 6,
-        labelOffset: 25,
-        textStyle: { 
-            fontSize: '14px', 
-            fill: '#000000', 
-            fontFamily: 'monospace', 
-            fontWeight: 'bold' 
-        },
-        labelStyle: { 
-            fontSize: '12px', 
-            fill: '#000000', 
-            fontFamily: 'monospace' 
-        }
+    static SIDEBAR_CONTROLS_STYLE = {
+        fontSize: '11px',
+        fill: '#2c3e50',
+        fontFamily: 'monospace'
     };
 
     // Animation frame configuration
