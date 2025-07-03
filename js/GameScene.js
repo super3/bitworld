@@ -163,7 +163,7 @@ createFloorWalls() {
     this.players = [];
 
     const playerConfigs = [
-        { name: ['John', 'Sim'], floor: 3, sprite: 'npc1' },
+        { name: ['John', 'Sim'], floor: 0, sprite: 'npc1' },
         { name: ['Alice', 'Lee'], floor: 2, sprite: 'npc2' },
          { name: ['Alice2', 'Lee2'], floor: 1, sprite: 'npc2' },
     ];
