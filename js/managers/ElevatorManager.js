@@ -281,7 +281,6 @@ continueElevatorTravel(originalTarget, direction) {
         this.elevatorLightFlicker(1);
 
         this.boardedPlayers.forEach(p => p.y = newY);
-        this.boardedPlayers.forEach(p => p.currentFloor = floor);
         const exiting = this.boardedPlayers.filter(p => p.targetFloor === floor);
         this.boardedPlayers = this.boardedPlayers.filter(p => p.targetFloor !== floor);
 
