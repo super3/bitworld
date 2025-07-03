@@ -30,6 +30,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('Elevator_opened', 'World/Elevator_opened.png');
         this.load.image('Elevator_slightlyOpened', 'World/Elevator_slightlyOpened.png');
         this.load.image('Elevator_closed', 'World/Elevator_closed.png');
+        this.load.image('Elevator_light', 'World/Elevator_light.png');
         this.load.image('Door_closed', 'World/Door_closed.png');
         this.load.image('Door_opened', 'World/Door_opened.png');
         this.load.image('Door_glass_closed', 'World/Door_glass_closed.png');
