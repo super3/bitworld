@@ -21,6 +21,11 @@ class GameScene extends Phaser.Scene {
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
+        this.load.spritesheet('npc3', 'NPC/Female/NPC 3.png', {
+            frameWidth: GameConfig.SPRITE_WIDTH,
+            frameHeight: GameConfig.SPRITE_HEIGHT
+        });
+
         // Load building sprites
         this.load.image('lobby', 'World/apartment_lobby.png');
         this.load.image('design1', 'World/apartment_design1.png');
@@ -165,7 +170,7 @@ createFloorWalls() {
     const playerConfigs = [
         { name: ['John', 'Sim'], floor: 3, sprite: 'npc1' },
         { name: ['Alice', 'Lee'], floor: 2, sprite: 'npc2' },
-         { name: ['Alice2', 'Lee2'], floor: 1, sprite: 'npc2' },
+         { name: ['Sarah', 'Johnson'], floor: 1, sprite: 'npc3' },
     ];
 
     // Track unique sprite keys to avoid duplicate animation creation
