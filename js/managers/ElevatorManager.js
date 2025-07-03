@@ -273,14 +273,18 @@ continueElevatorTravel(originalTarget, direction) {
             return;
         }
 
-        this.scene.time.delayedCall(500, () => {
-            if(this.elevatorCurrentFloor != originalTarget  )
-            this.elevatorLightFlicker(0);
-        });
-
+        // Move to next floor
         this.elevatorCurrentFloor += direction;
         const floor = this.elevatorCurrentFloor;
         const newY = this.scene.getFloorY(floor);
+        
+        // Only flicker light off if not at target floor yet
+        if (this.elevatorCurrentFloor !== originalTarget) {
+            this.scene.time.delayedCall(500, () => {
+                this.elevatorLightFlicker(0);
+            });
+        }
+        
         // Move elevator light to match new floor
         this.elevatorLight.y = newY - GameConfig.GROUND_HEIGHT - GameConfig.SPRITE_HEIGHT + 3+25;
         this.elevatorLightFlicker(1);
