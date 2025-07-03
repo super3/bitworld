@@ -1,5 +1,5 @@
 {
-  "name": "simworld-js",
+  "name": "bitworld-js",
   "version": "1.0.0",
   "description": "A 2D simulation world game built with Phaser.js",
   "main": "index.html",

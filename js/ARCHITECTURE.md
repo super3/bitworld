@@ -1,6 +1,6 @@
 # Game Architecture
 
-This document describes the refactored architecture of the Simworld game.
+This document describes the refactored architecture of the bitworld.gg game.
 
 ## Overview
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimWorld - A Pixel Life Simulation Game</title>
+    <title>bitworld.gg - A Pixel Life Simulation Game</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
         * {
@@ -493,7 +493,7 @@
         </div>
         <div class="hero-content">
             <div class="hero-left">
-                <h1>SimWorld</h1>
+                <h1>bitworld.gg</h1>
                 <p>A pixel life simulation where you live, explore, and make friends in a growing city.</p>
                 <div class="email-form">
                     <h3>Early Access — 128 future citizens waiting</h3>
@@ -590,9 +590,9 @@
                 submitButton.textContent = 'Join Waitlist';
                 
                 // Store in localStorage for demo
-                const waitlist = JSON.parse(localStorage.getItem('simworld_waitlist') || '[]');
+                const waitlist = JSON.parse(localStorage.getItem('bitworld_waitlist') || '[]');
                 waitlist.push({ email, timestamp: new Date().toISOString() });
-                localStorage.setItem('simworld_waitlist', JSON.stringify(waitlist));
+                localStorage.setItem('bitworld_waitlist', JSON.stringify(waitlist));
                 
             }, 1000);
         }
