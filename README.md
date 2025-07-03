@@ -1,4 +1,4 @@
-# Bitworld
+# bitworld.gg
 
 A 2D simulation game built with Phaser.js featuring an animated character in a multi-story building environment.
 
