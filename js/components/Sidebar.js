@@ -64,7 +64,7 @@ class Sidebar {
             posVal,
             {
                 fontSize: '12px',
-                fill: '#000000',
+                fill: '#b0b0b0',  // Light gray for better contrast
                 fontFamily: 'monospace'
             }
         );
@@ -86,11 +86,11 @@ class Sidebar {
         
         // Left click control
         this.leftClickIcon = this.scene.add.graphics();
-        this.leftClickIcon.fillStyle(0x000000, 1);
+        this.leftClickIcon.fillStyle(0x94a3b8, 1);  // Light gray for mouse body
         this.leftClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, controlsY, 18, 20, 3);
-        this.leftClickIcon.fillStyle(0xffffff, 1);
+        this.leftClickIcon.fillStyle(0x64b5f6, 1);  // Accent blue for left button
         this.leftClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
-        this.leftClickIcon.lineStyle(1, 0x000000, 1);
+        this.leftClickIcon.lineStyle(1, 0x2196f3, 1);  // Blue border
         this.leftClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
         this.elements.push(this.leftClickIcon);
         
@@ -105,11 +105,11 @@ class Sidebar {
         // Right click control
         const rightClickY = controlsY + 30;
         this.rightClickIcon = this.scene.add.graphics();
-        this.rightClickIcon.fillStyle(0x000000, 1);
+        this.rightClickIcon.fillStyle(0x94a3b8, 1);  // Light gray for mouse body
         this.rightClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, rightClickY, 18, 20, 3);
-        this.rightClickIcon.fillStyle(0xffffff, 1);
+        this.rightClickIcon.fillStyle(0x64b5f6, 1);  // Accent blue for right button
         this.rightClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
-        this.rightClickIcon.lineStyle(1, 0x000000, 1);
+        this.rightClickIcon.lineStyle(1, 0x2196f3, 1);  // Blue border
         this.rightClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
         this.elements.push(this.rightClickIcon);
         
