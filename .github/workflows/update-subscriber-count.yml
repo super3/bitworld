@@ -50,16 +50,43 @@ jobs:
         echo "Subscriber count: $COUNT"
         echo "count=$COUNT" >> $GITHUB_OUTPUT
     
-    - name: Commit and push if changed
+    - name: Update Gist with subscriber count
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        # Create or update gist with subscriber count
+        GIST_ID="${{ secrets.GIST_ID }}"
         
-        # Check if file has changed
-        if [[ `git status --porcelain subscriber-count.json` ]]; then
-          git add subscriber-count.json
-          git commit -m "Update subscriber count to ${{ steps.fetch-count.outputs.count }}"
-          git push
+        if [ -z "$GIST_ID" ]; then
+          echo "Creating new gist..."
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/gists \
+            -d '{
+              "description": "Bitworld subscriber count",
+              "public": true,
+              "files": {
+                "subscriber-count.json": {
+                  "content": '"$(cat subscriber-count.json | jq -c .)"'
+                }
+              }
+            }')
+          
+          NEW_GIST_ID=$(echo $RESPONSE | jq -r '.id')
+          echo "Created gist with ID: $NEW_GIST_ID"
+          echo "Add this as GIST_ID secret in your repository"
         else
-          echo "No changes to subscriber count"
+          # Update existing gist
+          curl -s -X PATCH \
+            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/gists/$GIST_ID \
+            -d '{
+              "files": {
+                "subscriber-count.json": {
+                  "content": '"$(cat subscriber-count.json | jq -c .)"'
+                }
+              }
+            }'
+          
+          echo "Updated gist: https://gist.github.com/$GIST_ID"
         fi

@@ -540,19 +540,27 @@
             }
         }
         
-        // Fetch real subscriber count from JSON file
-        fetch('/subscriber-count.json')
-            .then(response => response.json())
-            .then(data => {
-                if (data.count) {
-                    subscriberCount = data.count;
+        // Fetch real subscriber count from Gist
+        // Replace YOUR_GIST_ID with the actual Gist ID after first run
+        const GIST_ID = 'YOUR_GIST_ID'; // This will be provided after first workflow run
+        
+        if (GIST_ID !== 'YOUR_GIST_ID') {
+            fetch(`https://gist.githubusercontent.com/super3/${GIST_ID}/raw/subscriber-count.json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count) {
+                        subscriberCount = data.count;
+                        updateSubscriberDisplay(subscriberCount);
+                    }
+                })
+                .catch(() => {
+                    // If fetch fails, use default count
                     updateSubscriberDisplay(subscriberCount);
-                }
-            })
-            .catch(() => {
-                // If fetch fails, use default count
-                updateSubscriberDisplay(subscriberCount);
-            });
+                });
+        } else {
+            // Use default count until Gist ID is configured
+            updateSubscriberDisplay(subscriberCount);
+        }
         
         // Track if form was submitted
         let formSubmitted = false;
