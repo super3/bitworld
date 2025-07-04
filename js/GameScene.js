@@ -73,13 +73,7 @@ class GameScene extends Phaser.Scene {
                 // Re-enable automation for previously selected player
                 if (this.selectedPlayer && this.selectedPlayer !== (clicked ? clicked.player : null)) {
                     this.selectedPlayer.isAutomated = true;
-                    // Reset to idle state when returning to automation
-                    this.selectedPlayer.targetX = null;
-                    this.selectedPlayer.vx = 0;
-                    this.selectedPlayer.isWalking = false;
-                    this.selectedPlayer.isIdling = true;
-                    this.selectedPlayer.idleTimer = 0;
-                    this.selectedPlayer.idleDuration = 1 + Math.random() * 2;
+                    // Don't interrupt any movement - let them complete their destination
                 }
                 
                 this.selectedPlayer = clicked ? clicked.player : null;
@@ -87,10 +81,13 @@ class GameScene extends Phaser.Scene {
                 // Disable automation for newly selected player
                 if (this.selectedPlayer) {
                     this.selectedPlayer.isAutomated = false;
-                    this.selectedPlayer.targetX = null; // Stop current movement
-                    this.selectedPlayer.vx = 0;
-                    this.selectedPlayer.isWalking = false;
-                    this.selectedPlayer.isIdling = false;
+                    // Stop any automated movement when selected
+                    if (!this.selectedPlayer.playerCommandedMovement) {
+                        this.selectedPlayer.targetX = null;
+                        this.selectedPlayer.vx = 0;
+                        this.selectedPlayer.isWalking = false;
+                        this.selectedPlayer.isIdling = false;
+                    }
                 }
                 
                 this.sidebar.updatePlayer(this.selectedPlayer);
@@ -121,10 +118,12 @@ class GameScene extends Phaser.Scene {
 
             if (clickedFloor !== selected.currentFloor) {
                 selected.deferredTargetX = pointer.worldX;
+                selected.playerCommandedMovement = true;
                 this.onElevatorZoneClicked(clickedFloor, selected);
   
             } else {
                 selected.targetX = pointer.worldX;
+                selected.playerCommandedMovement = true;
             }
         });
 
@@ -324,7 +323,19 @@ onElevatorZoneClicked(targetFloor, player) {
         this.players.forEach(({ player, sprite }) => {
             // Handle automated NPC behavior
             if (player.isAutomated && player !== this.selectedPlayer && !player.waitingForElevator && !player.inElevator) {
-                this.updateAutomatedBehavior(player, dt);
+                // If they have a player-commanded movement, use normal movement
+                if (player.playerCommandedMovement && player.targetX !== null) {
+                    player.moveTowardTarget(dt);
+                    // Clear the flag when they reach their destination
+                    if (player.targetX === null) {
+                        player.playerCommandedMovement = false;
+                        player.isIdling = true;
+                        player.idleTimer = 0;
+                        player.idleDuration = 1 + Math.random() * 2;
+                    }
+                } else {
+                    this.updateAutomatedBehavior(player, dt);
+                }
             } else {
                 // Regular player movement
                 player.moveTowardTarget(dt);
