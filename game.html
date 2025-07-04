@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>bitworld.gg</title>
+    <title>bitworld.gg - A Pixel Life Simulation Game</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
     <style>
@@ -118,7 +118,7 @@
     <div class="game-wrapper">
         <div class="game-header">
             <div class="game-header-left">LIVE CAMERA</div>
-            <div class="viewer-count" id="viewerCount">1 player</div>
+            <div class="viewer-count" id="viewerCount">1 viewer</div>
         </div>
         <div id="game-container"></div>
     </div>
@@ -141,15 +141,6 @@
         // Prevent right-click context menu
         document.addEventListener('contextmenu', event => event.preventDefault());
         
-        // Simulate viewer count updates (replace with real implementation)
-        function updateViewerCount() {
-            const viewerElement = document.getElementById('viewerCount');
-            const count = Math.floor(Math.random() * 5) + 1;
-            viewerElement.textContent = count === 1 ? '1 player' : `${count} players`;
-        }
-        
-        // Update viewer count occasionally
-        setInterval(updateViewerCount, 30000);
     </script>
 </body>
 </html>
