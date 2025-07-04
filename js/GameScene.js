@@ -81,13 +81,14 @@ class GameScene extends Phaser.Scene {
                 // Disable automation for newly selected player
                 if (this.selectedPlayer) {
                     this.selectedPlayer.isAutomated = false;
-                    // Stop any automated movement when selected
+                    // Stop any automated movement when selected (but keep player-commanded movement)
                     if (!this.selectedPlayer.playerCommandedMovement) {
                         this.selectedPlayer.targetX = null;
                         this.selectedPlayer.vx = 0;
                         this.selectedPlayer.isWalking = false;
                         this.selectedPlayer.isIdling = false;
                     }
+                    // Note: Keep playerCommandedMovement flag intact so they continue to destination
                 }
                 
                 this.sidebar.updatePlayer(this.selectedPlayer);
@@ -325,14 +326,21 @@ onElevatorZoneClicked(targetFloor, player) {
             if (player.isAutomated && player !== this.selectedPlayer && !player.waitingForElevator && !player.inElevator) {
                 // If they have a player-commanded movement, use normal movement
                 if (player.playerCommandedMovement && player.targetX !== null) {
+                    const previousTargetX = player.targetX;
                     player.moveTowardTarget(dt);
-                    // Clear the flag when they reach their destination
-                    if (player.targetX === null) {
+                    // Check if they just reached their destination
+                    if (previousTargetX !== null && player.targetX === null) {
                         player.playerCommandedMovement = false;
                         player.isIdling = true;
                         player.idleTimer = 0;
                         player.idleDuration = 1 + Math.random() * 2;
                     }
+                } else if (player.playerCommandedMovement && player.targetX === null) {
+                    // Edge case: playerCommandedMovement is true but targetX is already null
+                    player.playerCommandedMovement = false;
+                    player.isIdling = true;
+                    player.idleTimer = 0;
+                    player.idleDuration = 1 + Math.random() * 2;
                 } else {
                     this.updateAutomatedBehavior(player, dt);
                 }
@@ -397,6 +405,7 @@ onElevatorZoneClicked(targetFloor, player) {
                 
                 // Clamp target within boundaries
                 player.targetX = Math.max(player.minX + 10, Math.min(player.maxX - 10, newTargetX));
+                player.playerCommandedMovement = false; // This is automated movement
             }
         } else if (player.targetX !== null) {
             // Move toward target using slower automated speed
@@ -467,7 +476,10 @@ onElevatorZoneClicked(targetFloor, player) {
             }
 
             player.vx = 0;
-            player.targetX = null;
+            // Don't cancel player-commanded movement at walls
+            if (!player.playerCommandedMovement) {
+                player.targetX = null;
+            }
         }
     });
     }
