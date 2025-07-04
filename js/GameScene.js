@@ -9,17 +9,17 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         // Load character sprite sheet
-        this.load.spritesheet('npc1', 'assets/npc/Male/NPC 1.png', {
+        this.load.spritesheet('npc1', 'assets/npc/male/NPC 1.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc2', 'assets/npc/Female/NPC 2.png', {
+        this.load.spritesheet('npc2', 'assets/npc/female/NPC 2.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc3', 'assets/npc/Female/NPC 3.png', {
+        this.load.spritesheet('npc3', 'assets/npc/female/NPC 3.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
