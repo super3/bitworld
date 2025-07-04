@@ -1,0 +1,61 @@
+name: Update Subscriber Count
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-count:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Fetch subscriber count from ConvertKit public page
+      id: fetch-count
+      run: |
+        # Try to fetch from public stats page
+        # Note: This URL pattern might need adjustment based on ConvertKit's public stats
+        STATS_URL="https://app.convertkit.com/forms/8269255/stats"
+        
+        # For now, we'll need the API key since public stats aren't easily scrapeable
+        # If you find a public endpoint, replace this section
+        if [ -n "${{ secrets.CONVERTKIT_API_SECRET }}" ]; then
+          RESPONSE=$(curl -s "https://api.convertkit.com/v3/forms/8269255?api_secret=${{ secrets.CONVERTKIT_API_SECRET }}")
+          COUNT=$(echo $RESPONSE | jq -r '.total_subscribers // 0')
+        else
+          # Fallback: increment existing count (not ideal but works without API)
+          if [ -f subscriber-count.json ]; then
+            COUNT=$(cat subscriber-count.json | jq -r '.count // 1')
+          else
+            COUNT=1
+          fi
+        fi
+        
+        # Update the JSON file
+        echo "{
+          \"count\": $COUNT,
+          \"lastUpdated\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+        }" > subscriber-count.json
+        
+        echo "Subscriber count: $COUNT"
+        echo "count=$COUNT" >> $GITHUB_OUTPUT
+    
+    - name: Commit and push if changed
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if file has changed
+        if [[ `git status --porcelain subscriber-count.json` ]]; then
+          git add subscriber-count.json
+          git commit -m "Update subscriber count to ${{ steps.fetch-count.outputs.count }}"
+          git push
+        else
+          echo "No changes to subscriber count"
+        fi
