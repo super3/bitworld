@@ -476,9 +476,16 @@ onElevatorZoneClicked(targetFloor, player) {
             }
 
             player.vx = 0;
-            // Don't cancel player-commanded movement at walls
-            if (!player.playerCommandedMovement) {
-                player.targetX = null;
+            player.targetX = null;
+            // Clear the playerCommandedMovement flag since they can't reach their destination
+            if (player.playerCommandedMovement) {
+                player.playerCommandedMovement = false;
+                // If automated, transition to idle
+                if (player.isAutomated) {
+                    player.isIdling = true;
+                    player.idleTimer = 0;
+                    player.idleDuration = 1 + Math.random() * 2;
+                }
             }
         }
     });
