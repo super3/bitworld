@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('Door_opened', 'assets/world/Door_opened.png');
         this.load.image('Door_glass_closed', 'assets/world/Door_glass_closed.png');
         this.load.image('Door_glass_opened', 'assets/world/Door_glass_opened.png');
-        this.load.image('UI_Pointer_white', '/assets/ui/Pointer_white.png');
+        this.load.image('UI_Pointer_white', 'assets/ui/Pointer_white.png');
 
         this.currentFloor = 0;
         this.elevator_X_position = 250;
@@ -51,7 +51,7 @@ class GameScene extends Phaser.Scene {
         this.selectionPointer.setOrigin(0.5, 1);
         this.selectionPointer.setScale(2);
         this.selectionPointer.setVisible(false); 
-        this.selectionPointer.setDepth(10); 
+        this.selectionPointer.setDepth(30); 
      
         this.elevatorManager = new ElevatorManager(this, this.player);
         this.input.on('pointerdown', (pointer) => {
