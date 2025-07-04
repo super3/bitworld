@@ -1,6 +1,6 @@
 # bitworld.gg
 
-A 2D simulation game built with Phaser.js featuring an animated character in a multi-story building environment.
+A pixel life simulation where you live, explore, and make friends in a growing city.
 
 ## Quick Start
 
