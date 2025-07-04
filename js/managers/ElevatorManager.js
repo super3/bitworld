@@ -222,7 +222,7 @@ class ElevatorManager {
             player.waitingForElevator = false;
             player.inElevator = false;
             //player.spriteRef.setVisible(true);
-            player.spriteRef.setDepth(10); // Return to default front layer
+            player.spriteRef.setDepth(20); // Return to default front layer
             if (player.deferredTargetX !== undefined) {
                 player.targetX = player.deferredTargetX;
                 delete player.deferredTargetX;

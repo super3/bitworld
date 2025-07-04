@@ -11,30 +11,31 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         // Load character sprite sheet
-        this.load.spritesheet('npc1', 'NPC/Male/NPC 1.png', {
+        this.load.spritesheet('npc1', 'assets/npc/Male/NPC 1.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc2', 'NPC/Female/NPC 2.png', {
+        this.load.spritesheet('npc2', 'assets/npc/Female/NPC 2.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
         // Load building sprites
-        this.load.image('lobby', 'World/apartment_lobby.png');
-        this.load.image('design1', 'World/apartment_design1.png');
-        this.load.image('design2', 'World/apartment_design2.png');
-        this.load.image('design3', 'World/apartment_design3.png');
-        this.load.image('roof', 'World/apartment_roof.png');
-        this.load.image('Elevator_opened', 'World/Elevator_opened.png');
-        this.load.image('Elevator_slightlyOpened', 'World/Elevator_slightlyOpened.png');
-        this.load.image('Elevator_closed', 'World/Elevator_closed.png');
-        this.load.image('Elevator_light', 'World/Elevator_light.png');
-        this.load.image('Door_closed', 'World/Door_closed.png');
-        this.load.image('Door_opened', 'World/Door_opened.png');
-        this.load.image('Door_glass_closed', 'World/Door_glass_closed.png');
-        this.load.image('Door_glass_opened', 'World/Door_glass_opened.png');
+        this.load.image('lobby', 'assets/world/apartment_lobby.png');
+        this.load.image('design1', 'assets/world/apartment_design1.png');
+        this.load.image('design2', 'assets/world/apartment_design2.png');
+        this.load.image('design3', 'assets/world/apartment_design3.png');
+        this.load.image('roof', 'assets/world/apartment_roof.png');
+        this.load.image('Elevator_opened', 'assets/world/Elevator_opened.png');
+        this.load.image('Elevator_slightlyOpened', 'assets/world/Elevator_slightlyOpened.png');
+        this.load.image('Elevator_closed', 'assets/world/Elevator_closed.png');
+        this.load.image('Elevator_light', 'assets/world/Elevator_light.png');
+        this.load.image('Door_closed', 'assets/world/Door_closed.png');
+        this.load.image('Door_opened', 'assets/world/Door_opened.png');
+        this.load.image('Door_glass_closed', 'assets/world/Door_glass_closed.png');
+        this.load.image('Door_glass_opened', 'assets/world/Door_glass_opened.png');
+        this.load.image('UI_Pointer_white', '/assets/ui/Pointer_white.png');
 
         this.currentFloor = 0;
         this.elevator_X_position = 250;
@@ -46,6 +47,11 @@ class GameScene extends Phaser.Scene {
         this.createUI();
         //this.setupInput();
 
+        this.selectionPointer = this.add.image(0, 0, 'UI_Pointer_white');
+        this.selectionPointer.setOrigin(0.5, 1);
+        this.selectionPointer.setScale(2);
+        this.selectionPointer.setVisible(false); 
+        this.selectionPointer.setDepth(10); 
      
         this.elevatorManager = new ElevatorManager(this, this.player);
         this.input.on('pointerdown', (pointer) => {
@@ -272,6 +278,17 @@ onElevatorZoneClicked(targetFloor, player) {
                 player.hasEnteredDoor = false;
             }
         });
+
+        if (this.selectedPlayer) {
+            this.selectionPointer.setVisible(true);
+            this.selectionPointer.x = this.selectedPlayer.x;
+            this.selectionPointer.y = this.selectedPlayer.y - 48; // adjust for head height
+            if(this.selectedPlayer.inElevator)
+                 this.selectionPointer.setVisible(false);
+        } else {
+            this.selectionPointer.setVisible(false);
+        }
+
 
         this.sidebar.updatePosition();
         //this.inputManager.update(dt);
