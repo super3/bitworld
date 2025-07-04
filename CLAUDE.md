@@ -3,7 +3,6 @@
 ## Commands to avoid
 - Do not run `npm start` - the user will handle starting the development server
 
-## Lint and type checking
-When completing a task, run the following commands if available:
-- `npm run lint`
-- `npm run typecheck`
+## Documentation
+- When the user asks for instructions or setup steps, provide them directly in the conversation
+- Do not create markdown files for instructions unless explicitly requested
