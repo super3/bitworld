@@ -1,0 +1,113 @@
+name: Update Subscriber Count
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-count:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Fetch subscriber count from ConvertKit public page
+      id: fetch-count
+      run: |
+        # Try to fetch from public stats page
+        # Note: This URL pattern might need adjustment based on ConvertKit's public stats
+        STATS_URL="https://app.convertkit.com/forms/8269255/stats"
+        
+        # For now, we'll need the API key since public stats aren't easily scrapeable
+        # If you find a public endpoint, replace this section
+        if [ -n "${{ secrets.CONVERTKIT_API_SECRET }}" ]; then
+          # Get form subscribers using the correct endpoint
+          RESPONSE=$(curl -s "https://api.convertkit.com/v3/forms/8269255/subscriptions?api_secret=${{ secrets.CONVERTKIT_API_SECRET }}")
+          echo "API Response: $RESPONSE"
+          COUNT=$(echo $RESPONSE | jq -r '.total_subscriptions // 0')
+        else
+          # Fallback: increment existing count (not ideal but works without API)
+          if [ -f subscriber-count.json ]; then
+            COUNT=$(cat subscriber-count.json | jq -r '.count // 1')
+          else
+            COUNT=1
+          fi
+        fi
+        
+        # Update the JSON file
+        echo "{
+          \"count\": $COUNT,
+          \"lastUpdated\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+        }" > subscriber-count.json
+        
+        echo "Subscriber count: $COUNT"
+        echo "count=$COUNT" >> $GITHUB_OUTPUT
+    
+    - name: Update Gist with subscriber count
+      run: |
+        # Create or update gist with subscriber count
+        GIST_ID="${{ secrets.GIST_ID }}"
+        
+        # Prepare the JSON content
+        JSON_CONTENT=$(cat subscriber-count.json | jq -c . | sed 's/"/\\"/g')
+        
+        if [ -z "$GIST_ID" ]; then
+          echo "Creating new gist..."
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/gists \
+            -d "{
+              \"description\": \"Bitworld subscriber count\",
+              \"public\": true,
+              \"files\": {
+                \"subscriber-count.json\": {
+                  \"content\": \"$JSON_CONTENT\"
+                }
+              }
+            }")
+          
+          echo "Full API Response: $RESPONSE"
+          
+          NEW_GIST_ID=$(echo $RESPONSE | jq -r '.id // empty')
+          if [ -n "$NEW_GIST_ID" ] && [ "$NEW_GIST_ID" != "null" ]; then
+            echo "Created gist with ID: $NEW_GIST_ID"
+            echo "Add this as GIST_ID secret in your repository"
+            echo "Gist URL: https://gist.github.com/$NEW_GIST_ID"
+          else
+            echo "Failed to create gist. Check if GIST_TOKEN has 'gist' scope."
+            echo "Error details: $(echo $RESPONSE | jq -r '.message // empty')"
+            exit 1
+          fi
+        else
+          # Update existing gist
+          echo "Updating existing gist: $GIST_ID"
+          UPDATE_RESPONSE=$(curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/gists/$GIST_ID \
+            -d "{
+              \"files\": {
+                \"subscriber-count.json\": {
+                  \"content\": \"$JSON_CONTENT\"
+                }
+              }
+            }")
+          
+          if echo "$UPDATE_RESPONSE" | jq -e '.id' > /dev/null; then
+            echo "Successfully updated gist: https://gist.github.com/$GIST_ID"
+          else
+            echo "Failed to update gist"
+            echo "Error: $(echo $UPDATE_RESPONSE | jq -r '.message // empty')"
+            exit 1
+          fi
+        fi

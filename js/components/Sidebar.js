@@ -64,7 +64,7 @@ class Sidebar {
             posVal,
             {
                 fontSize: '12px',
-                fill: '#000000',
+                fill: '#b0b0b0',  // Light gray for better contrast
                 fontFamily: 'monospace'
             }
         );
@@ -81,46 +81,48 @@ class Sidebar {
         );
         this.elements.push(this.controlsHeader);
 
-        // Create key controls
-        this.createKeyControl('A', 'Move Left', GameConfig.SIDEBAR_KEY_A_Y);
-        this.createKeyControl('D', 'Move Right', GameConfig.SIDEBAR_KEY_D_Y);
+        // Create mouse icon with controls
+        const controlsY = GameConfig.SIDEBAR_CONTROLS_Y + 25;
+        
+        // Left click control
+        this.leftClickIcon = this.scene.add.graphics();
+        this.leftClickIcon.fillStyle(0x94a3b8, 1);  // Light gray for mouse body
+        this.leftClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, controlsY, 18, 20, 3);
+        this.leftClickIcon.fillStyle(0x64b5f6, 1);  // Accent blue for left button
+        this.leftClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
+        this.leftClickIcon.lineStyle(1, 0x2196f3, 1);  // Blue border
+        this.leftClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 2, controlsY + 2, 7, 10);
+        this.elements.push(this.leftClickIcon);
+        
+        this.leftClickText = this.scene.add.text(
+            GameConfig.SIDEBAR_MARGIN + 25,
+            controlsY + 2,
+            "Move Player",
+            GameConfig.SIDEBAR_CONTROLS_STYLE
+        );
+        this.elements.push(this.leftClickText);
+        
+        // Right click control
+        const rightClickY = controlsY + 30;
+        this.rightClickIcon = this.scene.add.graphics();
+        this.rightClickIcon.fillStyle(0x94a3b8, 1);  // Light gray for mouse body
+        this.rightClickIcon.fillRoundedRect(GameConfig.SIDEBAR_MARGIN, rightClickY, 18, 20, 3);
+        this.rightClickIcon.fillStyle(0x64b5f6, 1);  // Accent blue for right button
+        this.rightClickIcon.fillRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
+        this.rightClickIcon.lineStyle(1, 0x2196f3, 1);  // Blue border
+        this.rightClickIcon.strokeRect(GameConfig.SIDEBAR_MARGIN + 9, rightClickY + 2, 7, 10);
+        this.elements.push(this.rightClickIcon);
+        
+        this.rightClickText = this.scene.add.text(
+            GameConfig.SIDEBAR_MARGIN + 25,
+            rightClickY + 2,
+            "Select Player",
+            GameConfig.SIDEBAR_CONTROLS_STYLE
+        );
+        this.elements.push(this.rightClickText);
     }
 
-    createKeyControl(key, label, y) {
-        const keyConfig = GameConfig.SIDEBAR_KEY_CONFIG;
-        
-        // Key background and border
-        const keyBorder = this.scene.add.rectangle(
-            keyConfig.x, y, 
-            keyConfig.size + keyConfig.borderWidth, 
-            keyConfig.size + keyConfig.borderWidth, 
-            keyConfig.borderColor
-        );
-        
-        const keyBg = this.scene.add.rectangle(
-            keyConfig.x, y, 
-            keyConfig.size, keyConfig.size, 
-            keyConfig.bgColor
-        );
 
-        // Key letter
-        const keyText = this.scene.add.text(
-            keyConfig.x - keyConfig.textOffset, 
-            y - keyConfig.textOffset, 
-            key, 
-            keyConfig.textStyle
-        );
-
-        // Label
-        const labelText = this.scene.add.text(
-            keyConfig.x + keyConfig.labelOffset, 
-            y - keyConfig.textOffset, 
-            label, 
-            keyConfig.labelStyle
-        );
-
-        this.elements.push(keyBorder, keyBg, keyText, labelText);
-    }
 
     updatePlayer(_player)
     {

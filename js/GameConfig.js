@@ -13,8 +13,8 @@ class GameConfig {
     static BACKGROUND_COLOR = 0x8ed2ff;  // Light blue sky
     static GROUND_COLOR = 0xa9574c;  // Brown earth
     static GRASS_COLOR = 0x30976c;  // Green grass
-    static TEXT_BOX_COLOR = 0xc8c8c8;  // Light gray
-    static TEXT_COLOR = 0x000000;  // Black text
+    static TEXT_BOX_COLOR = 0x0a0c1d;  // RGB(10, 12, 29) - very dark blue
+    static TEXT_COLOR = 0xf5f7fa;  // Light text matching theme
     
     // Character sprite settings
     static SPRITE_WIDTH = 32;  // Width of a single sprite frame
@@ -39,53 +39,36 @@ class GameConfig {
     static BUILDING_SCALE = 2;  // Scale factor for building sprites
 
     // Sidebar settings
-    static SIDEBAR_BORDER_WIDTH = 4;
-    static SIDEBAR_BORDER_COLOR = 0x2c3e50;
+    static SIDEBAR_BORDER_WIDTH = 2;
+    static SIDEBAR_BORDER_COLOR = 0x5588bb;  // Lighter blue matching live camera border
     static SIDEBAR_MARGIN = GameConfig.WINDOW_WIDTH + 20;
     static SIDEBAR_PLAYER_Y = 30;
     static SIDEBAR_CONTROLS_Y = 80;
-    static SIDEBAR_KEY_A_Y = 120;
-    static SIDEBAR_KEY_D_Y = 155;
 
     // Sidebar text styles
     static SIDEBAR_PLAYER_STYLE = {
         fontSize: '18px',
-        fill: '#000000',
+        fill: '#ffffff',  // White for maximum contrast
         fontFamily: 'monospace',
         fontWeight: 'bold'
     };
 
     static SIDEBAR_HEADER_STYLE = {
         fontSize: '14px',
-        fill: '#000000',
+        fill: '#8ed2ff',  // Bright blue for headers
         fontFamily: 'monospace'
     };
 
-    // Sidebar key configuration
-    static SIDEBAR_KEY_CONFIG = {
-        x: GameConfig.WINDOW_WIDTH + 30,
-        size: 20,
-        borderWidth: 4,
-        borderColor: 0x000000,
-        bgColor: 0xffffff,
-        textOffset: 6,
-        labelOffset: 25,
-        textStyle: { 
-            fontSize: '14px', 
-            fill: '#000000', 
-            fontFamily: 'monospace', 
-            fontWeight: 'bold' 
-        },
-        labelStyle: { 
-            fontSize: '12px', 
-            fill: '#000000', 
-            fontFamily: 'monospace' 
-        }
+    static SIDEBAR_CONTROLS_STYLE = {
+        fontSize: '11px',
+        fill: '#e0e0e0',  // Light gray for better readability
+        fontFamily: 'monospace'
     };
 
     // Animation frame configuration
     static WALK_FRAMES = { start: 0, end: 3 };
     static IDLE_FRAMES = { start: 5, end: 7 };
-
-    static ELEVATOR_SPEED = 1500;//milli seconds
+    
+    // Elevator settings
+    static ELEVATOR_SPEED = 1500; // milliseconds
 } 
