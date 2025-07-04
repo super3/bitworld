@@ -28,9 +28,10 @@ jobs:
         # For now, we'll need the API key since public stats aren't easily scrapeable
         # If you find a public endpoint, replace this section
         if [ -n "${{ secrets.CONVERTKIT_API_SECRET }}" ]; then
-          RESPONSE=$(curl -s "https://api.convertkit.com/v3/forms/8269255?api_secret=${{ secrets.CONVERTKIT_API_SECRET }}")
+          # Get form subscribers using the correct endpoint
+          RESPONSE=$(curl -s "https://api.convertkit.com/v3/forms/8269255/subscriptions?api_secret=${{ secrets.CONVERTKIT_API_SECRET }}")
           echo "API Response: $RESPONSE"
-          COUNT=$(echo $RESPONSE | jq -r '.total_subscribers // 0')
+          COUNT=$(echo $RESPONSE | jq -r '.total_subscriptions // 0')
         else
           # Fallback: increment existing count (not ideal but works without API)
           if [ -f subscriber-count.json ]; then
