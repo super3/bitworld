@@ -55,38 +55,59 @@ jobs:
         # Create or update gist with subscriber count
         GIST_ID="${{ secrets.GIST_ID }}"
         
+        # Prepare the JSON content
+        JSON_CONTENT=$(cat subscriber-count.json | jq -c . | sed 's/"/\\"/g')
+        
         if [ -z "$GIST_ID" ]; then
           echo "Creating new gist..."
           RESPONSE=$(curl -s -X POST \
-            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
             https://api.github.com/gists \
-            -d '{
-              "description": "Bitworld subscriber count",
-              "public": true,
-              "files": {
-                "subscriber-count.json": {
-                  "content": '"$(cat subscriber-count.json | jq -c .)"'
+            -d "{
+              \"description\": \"Bitworld subscriber count\",
+              \"public\": true,
+              \"files\": {
+                \"subscriber-count.json\": {
+                  \"content\": \"$JSON_CONTENT\"
                 }
               }
-            }')
+            }")
           
-          NEW_GIST_ID=$(echo $RESPONSE | jq -r '.id')
-          echo "Created gist with ID: $NEW_GIST_ID"
-          echo "Add this as GIST_ID secret in your repository"
+          echo "Full API Response: $RESPONSE"
+          
+          NEW_GIST_ID=$(echo $RESPONSE | jq -r '.id // empty')
+          if [ -n "$NEW_GIST_ID" ] && [ "$NEW_GIST_ID" != "null" ]; then
+            echo "Created gist with ID: $NEW_GIST_ID"
+            echo "Add this as GIST_ID secret in your repository"
+            echo "Gist URL: https://gist.github.com/$NEW_GIST_ID"
+          else
+            echo "Failed to create gist. Check if GIST_TOKEN has 'gist' scope."
+            echo "Error details: $(echo $RESPONSE | jq -r '.message // empty')"
+            exit 1
+          fi
         else
           # Update existing gist
-          curl -s -X PATCH \
-            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+          echo "Updating existing gist: $GIST_ID"
+          UPDATE_RESPONSE=$(curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
             https://api.github.com/gists/$GIST_ID \
-            -d '{
-              "files": {
-                "subscriber-count.json": {
-                  "content": '"$(cat subscriber-count.json | jq -c .)"'
+            -d "{
+              \"files\": {
+                \"subscriber-count.json\": {
+                  \"content\": \"$JSON_CONTENT\"
                 }
               }
-            }'
+            }")
           
-          echo "Updated gist: https://gist.github.com/$GIST_ID"
+          if echo "$UPDATE_RESPONSE" | jq -e '.id' > /dev/null; then
+            echo "Successfully updated gist: https://gist.github.com/$GIST_ID"
+          else
+            echo "Failed to update gist"
+            echo "Error: $(echo $UPDATE_RESPONSE | jq -r '.message // empty')"
+            exit 1
+          fi
         fi
