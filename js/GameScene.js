@@ -19,7 +19,7 @@ class GameScene extends Phaser.Scene {
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc3', 'NPC/Female/NPC 3.png', {
+        this.load.spritesheet('npc3', 'assets/npc/Female/NPC 3.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
@@ -347,14 +347,16 @@ onElevatorZoneClicked(targetFloor, player) {
             }
         });
 
-        if (this.selectedPlayer) {
-            this.selectionPointer.setVisible(true);
-            this.selectionPointer.x = this.selectedPlayer.x;
-            this.selectionPointer.y = this.selectedPlayer.y - 48; // adjust for head height
-            if(this.selectedPlayer.inElevator)
-                 this.selectionPointer.setVisible(false);
-        } else {
-            this.selectionPointer.setVisible(false);
+        if (this.selectionPointer) {
+            if (this.selectedPlayer) {
+                this.selectionPointer.setVisible(true);
+                this.selectionPointer.x = this.selectedPlayer.x;
+                this.selectionPointer.y = this.selectedPlayer.y - 48; // adjust for head height
+                if(this.selectedPlayer.inElevator)
+                     this.selectionPointer.setVisible(false);
+            } else {
+                this.selectionPointer.setVisible(false);
+            }
         }
 
 
