@@ -541,8 +541,7 @@
         }
         
         // Fetch real subscriber count from Gist
-        // Replace YOUR_GIST_ID with the actual Gist ID after first run
-        const GIST_ID = 'YOUR_GIST_ID'; // This will be provided after first workflow run
+        const GIST_ID = 'd44a379e8e75c51d4651288c5785748f';
         
         if (GIST_ID !== 'YOUR_GIST_ID') {
             fetch(`https://gist.githubusercontent.com/super3/${GIST_ID}/raw/subscriber-count.json`)
