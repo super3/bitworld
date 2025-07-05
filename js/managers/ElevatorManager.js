@@ -4,9 +4,6 @@ class ElevatorManager {
         this.scene = scene;
         this.isLocked = false;
 
-        this.elevatorZones = [];
-        this.zoneGraphics = [];
-
         this.currentDoorState = Array(this.scene.buildingManager.floors.length).fill('closed');
         this.elevatorCurrentFloor = scene.currentFloor;
 
@@ -18,28 +15,29 @@ class ElevatorManager {
         for (let i = 0; i < scene.buildingManager.floors.length; i++) {
             const y = scene.getFloorY(i) - GameConfig.GROUND_HEIGHT - GameConfig.SPRITE_HEIGHT + 3;
 
-            const zone = scene.add.zone(elevatorX, y, 50, 50);
-            zone.setInteractive();
-            zone.floorIndex = i;
 
-            /*
-            const g = this.scene.add.graphics();
-            g.lineStyle(2, 0xFFFF00);
-            if (i === this.elevatorCurrentFloor) {
-                g.fillStyle(0xFFFF00, 0.3);
-                g.fillRect(elevatorX - 25, y - 25, 50, 50);
-            }
-            g.strokeRect(elevatorX - 25, y - 25, 50, 50);
-            this.zoneGraphics.push(g);
-            g.setAlpha(i === this.elevatorCurrentFloor ? 0.3 : 0); // only keep yellow tint
-            */
-
-            this.elevatorZones.push(zone);
             const elevatorSprite = this.scene.add.image(elevatorX, y+25, 'Elevator_closed');
             elevatorSprite.setDepth(1);
-            elevatorSprite.setScale(2); // or maybe 1.15 for better fit
+            elevatorSprite.setScale(2); 
+            elevatorSprite.setOrigin(0.5, 1); 
 
-            elevatorSprite.setOrigin(0.5, 1); // bottom aligned
+            //elevator backdrop
+            const tileSize = 16;
+            const backdropRT = this.scene.add.renderTexture(elevatorX, y + 25+5, 32, 32);
+            backdropRT.setOrigin(0.5, 1);
+            backdropRT.setDepth(0);
+            backdropRT.setScale(2); 
+
+            // Top-left of red background is tile index 512
+            const indices = [1225, 1226, 1260, 1261];
+
+            let bdrop = 0;
+            for (let row = 0; row < 2; row++) {
+                for (let col = 0; col < 2; col++) {
+                    backdropRT.drawFrame('wallpaper_tiles', indices[bdrop], col * tileSize, row * tileSize);
+                    bdrop++;
+                }
+            }
 
             this.elevatorSprites.push(elevatorSprite);
         }
@@ -329,24 +327,6 @@ continueElevatorTravel(originalTarget, direction) {
     step(); // Start the loop
 }
 
-
-    updateZoneGraphics(currentFloor) {
-        this.zoneGraphics.forEach((g, i) => {
-            g.clear();
-
-            const zone = this.elevatorZones[i];
-            const x = zone.x;
-            const y = zone.y;
-
-            if (i === currentFloor) {
-                g.fillStyle(0xFFFF00, 0.3);
-                g.fillRect(x - 25, y - 25, 50, 50);
-            }
-
-            g.strokeRect(x - 25, y - 25, 50, 50);
-            g.setAlpha(i === currentFloor ? 0.3 : 0); // <-- important
-        });
-    }
 
 updateElevatorSprite(floorIndex, isOpen) {
     const sprite = this.elevatorSprites[floorIndex];
