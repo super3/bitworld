@@ -9,35 +9,36 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         // Load character sprite sheet
-        this.load.spritesheet('npc1', 'NPC/Male/NPC 1.png', {
+        this.load.spritesheet('npc1', 'assets/npc/male/NPC 1.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc2', 'NPC/Female/NPC 2.png', {
+        this.load.spritesheet('npc2', 'assets/npc/female/NPC 2.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
-        this.load.spritesheet('npc3', 'NPC/Female/NPC 3.png', {
+        this.load.spritesheet('npc3', 'assets/npc/female/NPC 3.png', {
             frameWidth: GameConfig.SPRITE_WIDTH,
             frameHeight: GameConfig.SPRITE_HEIGHT
         });
 
         // Load building sprites
-        this.load.image('lobby', 'World/apartment_lobby.png');
-        this.load.image('design1', 'World/apartment_design1.png');
-        this.load.image('design2', 'World/apartment_design2.png');
-        this.load.image('design3', 'World/apartment_design3.png');
-        this.load.image('roof', 'World/apartment_roof.png');
-        this.load.image('Elevator_opened', 'World/Elevator_opened.png');
-        this.load.image('Elevator_slightlyOpened', 'World/Elevator_slightlyOpened.png');
-        this.load.image('Elevator_closed', 'World/Elevator_closed.png');
-        this.load.image('Elevator_light', 'World/Elevator_light.png');
-        this.load.image('Door_closed', 'World/Door_closed.png');
-        this.load.image('Door_opened', 'World/Door_opened.png');
-        this.load.image('Door_glass_closed', 'World/Door_glass_closed.png');
-        this.load.image('Door_glass_opened', 'World/Door_glass_opened.png');
+        this.load.image('lobby', 'assets/world/apartment_lobby.png');
+        this.load.image('design1', 'assets/world/apartment_design1.png');
+        this.load.image('design2', 'assets/world/apartment_design2.png');
+        this.load.image('design3', 'assets/world/apartment_design3.png');
+        this.load.image('roof', 'assets/world/apartment_roof.png');
+        this.load.image('Elevator_opened', 'assets/world/Elevator_opened.png');
+        this.load.image('Elevator_slightlyOpened', 'assets/world/Elevator_slightlyOpened.png');
+        this.load.image('Elevator_closed', 'assets/world/Elevator_closed.png');
+        this.load.image('Elevator_light', 'assets/world/Elevator_light.png');
+        this.load.image('Door_closed', 'assets/world/Door_closed.png');
+        this.load.image('Door_opened', 'assets/world/Door_opened.png');
+        this.load.image('Door_glass_closed', 'assets/world/Door_glass_closed.png');
+        this.load.image('Door_glass_opened', 'assets/world/Door_glass_opened.png');
+        this.load.image('UI_Pointer_white', 'assets/ui/Pointer_white.png');
 
         this.currentFloor = 0;
         this.elevator_X_position = 250;
@@ -49,6 +50,12 @@ class GameScene extends Phaser.Scene {
         this.createUI();
         //this.setupInput();
 
+        this.selectionPointer = this.add.image(0, 0, 'UI_Pointer_white');
+        this.selectionPointer.setOrigin(0.5, 1);
+        this.selectionPointer.setScale(2);
+        this.selectionPointer.setVisible(false); 
+        this.selectionPointer.setDepth(30); 
+     
         // Initialize automated NPC behaviors
         this.initializeNPCBehaviors();
 
@@ -66,13 +73,7 @@ class GameScene extends Phaser.Scene {
                 // Re-enable automation for previously selected player
                 if (this.selectedPlayer && this.selectedPlayer !== (clicked ? clicked.player : null)) {
                     this.selectedPlayer.isAutomated = true;
-                    // Reset to idle state when returning to automation
-                    this.selectedPlayer.targetX = null;
-                    this.selectedPlayer.vx = 0;
-                    this.selectedPlayer.isWalking = false;
-                    this.selectedPlayer.isIdling = true;
-                    this.selectedPlayer.idleTimer = 0;
-                    this.selectedPlayer.idleDuration = 1 + Math.random() * 2;
+                    // Don't interrupt any movement - let them complete their destination
                 }
                 
                 this.selectedPlayer = clicked ? clicked.player : null;
@@ -80,10 +81,14 @@ class GameScene extends Phaser.Scene {
                 // Disable automation for newly selected player
                 if (this.selectedPlayer) {
                     this.selectedPlayer.isAutomated = false;
-                    this.selectedPlayer.targetX = null; // Stop current movement
-                    this.selectedPlayer.vx = 0;
-                    this.selectedPlayer.isWalking = false;
-                    this.selectedPlayer.isIdling = false;
+                    // Stop any automated movement when selected (but keep player-commanded movement)
+                    if (!this.selectedPlayer.playerCommandedMovement) {
+                        this.selectedPlayer.targetX = null;
+                        this.selectedPlayer.vx = 0;
+                        this.selectedPlayer.isWalking = false;
+                        this.selectedPlayer.isIdling = false;
+                    }
+                    // Note: Keep playerCommandedMovement flag intact so they continue to destination
                 }
                 
                 this.sidebar.updatePlayer(this.selectedPlayer);
@@ -114,10 +119,12 @@ class GameScene extends Phaser.Scene {
 
             if (clickedFloor !== selected.currentFloor) {
                 selected.deferredTargetX = pointer.worldX;
+                selected.playerCommandedMovement = true;
                 this.onElevatorZoneClicked(clickedFloor, selected);
   
             } else {
                 selected.targetX = pointer.worldX;
+                selected.playerCommandedMovement = true;
             }
         });
 
@@ -317,7 +324,26 @@ onElevatorZoneClicked(targetFloor, player) {
         this.players.forEach(({ player, sprite }) => {
             // Handle automated NPC behavior
             if (player.isAutomated && player !== this.selectedPlayer && !player.waitingForElevator && !player.inElevator) {
-                this.updateAutomatedBehavior(player, dt);
+                // If they have a player-commanded movement, use normal movement
+                if (player.playerCommandedMovement && player.targetX !== null) {
+                    const previousTargetX = player.targetX;
+                    player.moveTowardTarget(dt);
+                    // Check if they just reached their destination
+                    if (previousTargetX !== null && player.targetX === null) {
+                        player.playerCommandedMovement = false;
+                        player.isIdling = true;
+                        player.idleTimer = 0;
+                        player.idleDuration = 1 + Math.random() * 2;
+                    }
+                } else if (player.playerCommandedMovement && player.targetX === null) {
+                    // Edge case: playerCommandedMovement is true but targetX is already null
+                    player.playerCommandedMovement = false;
+                    player.isIdling = true;
+                    player.idleTimer = 0;
+                    player.idleDuration = 1 + Math.random() * 2;
+                } else {
+                    this.updateAutomatedBehavior(player, dt);
+                }
             } else {
                 // Regular player movement
                 player.moveTowardTarget(dt);
@@ -339,6 +365,19 @@ onElevatorZoneClicked(targetFloor, player) {
                 player.hasEnteredDoor = false;
             }
         });
+
+        if (this.selectionPointer) {
+            if (this.selectedPlayer) {
+                this.selectionPointer.setVisible(true);
+                this.selectionPointer.x = this.selectedPlayer.x;
+                this.selectionPointer.y = this.selectedPlayer.y - 48; // adjust for head height
+                if(this.selectedPlayer.inElevator)
+                     this.selectionPointer.setVisible(false);
+            } else {
+                this.selectionPointer.setVisible(false);
+            }
+        }
+
 
         this.sidebar.updatePosition();
         //this.inputManager.update(dt);
@@ -366,6 +405,7 @@ onElevatorZoneClicked(targetFloor, player) {
                 
                 // Clamp target within boundaries
                 player.targetX = Math.max(player.minX + 10, Math.min(player.maxX - 10, newTargetX));
+                player.playerCommandedMovement = false; // This is automated movement
             }
         } else if (player.targetX !== null) {
             // Move toward target using slower automated speed
@@ -437,6 +477,16 @@ onElevatorZoneClicked(targetFloor, player) {
 
             player.vx = 0;
             player.targetX = null;
+            // Clear the playerCommandedMovement flag since they can't reach their destination
+            if (player.playerCommandedMovement) {
+                player.playerCommandedMovement = false;
+                // If automated, transition to idle
+                if (player.isAutomated) {
+                    player.isIdling = true;
+                    player.idleTimer = 0;
+                    player.idleDuration = 1 + Math.random() * 2;
+                }
+            }
         }
     });
     }

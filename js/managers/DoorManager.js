@@ -34,7 +34,7 @@ DoorManager.prototype.addDoor = function (floor, x, width = 32, height = 60, doo
 };
 
 DoorManager.prototype.checkDoorCollision = function (player, dx) {
-    if (player.hasEnteredDoor) return null;
+    if (player.hasEnteredDoor || player.walkingThroughDoor) return null;
 
     return this.doors.find(door =>
         door.floor === player.currentFloor &&
@@ -66,7 +66,10 @@ DoorManager.prototype.tryOpenDoor = function (player, dx) {
     this.scene.time.delayedCall(200, () => {
         if (originalTargetX !== null && player.walkingThroughDoor) {
             player.targetX = originalTargetX;
-
+            // Make sure playerCommandedMovement flag is preserved
+            if (player.playerCommandedMovement === undefined) {
+                player.playerCommandedMovement = !player.isAutomated;
+            }
         }
     });
 
