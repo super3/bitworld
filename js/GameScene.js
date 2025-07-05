@@ -37,6 +37,10 @@ class GameScene extends Phaser.Scene {
         this.load.image('Door_glass_opened', 'assets/world/Door_glass_opened.png');
         this.load.image('UI_Pointer_white', '/assets/ui/Pointer_white.png');
 
+        this.load.spritesheet('wallpaper_tiles', 'assets/world/Wallpaper Tilesets.png', {
+            frameWidth: 16,
+            frameHeight: 16
+        });
         this.currentFloor = 0;
         this.elevator_X_position = 250;
     }
