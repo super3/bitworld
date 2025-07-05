@@ -191,7 +191,6 @@ class ElevatorManager {
                 if (Math.abs(dx) < 2) {
                     player.x = targetX;
                     player.vx = 0;
-                    //player.spriteRef.setVisible(false);
                     player.spriteRef.setDepth(0); // Behind the elevator door
                     player.inElevator = true;
                     player.waitingForElevator = false;
@@ -223,7 +222,6 @@ class ElevatorManager {
             player.targetFloor = null;
             player.waitingForElevator = false;
             player.inElevator = false;
-            //player.spriteRef.setVisible(true);
             player.spriteRef.setDepth(20); // Return to default front layer
             if (player.deferredTargetX !== undefined) {
                 player.targetX = player.deferredTargetX;

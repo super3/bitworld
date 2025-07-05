@@ -52,7 +52,6 @@ class GameScene extends Phaser.Scene {
         this.createEnvironment();
         this.createPlayerEntities();
         this.createUI();
-        //this.setupInput();
 
         this.selectionPointer = this.add.image(0, 0, 'UI_Pointer_white');
         this.selectionPointer.setOrigin(0.5, 1);
@@ -506,10 +505,7 @@ getClickedFloorIndex(y) {
         const top = fy - halfHeight;
         const bottom = fy + halfHeight;
 
-        //console.log(`Checking floor ${i}: y=${y}, top=${top}, bottom=${bottom}`);
-
         if (y >= top && y <= bottom) {
-            //console.log(`→ Clicked floor ${i}`);
             return i;
         }
     }
