@@ -41,9 +41,43 @@
                 <div id="game-preview-container"></div>
             </div>
         </div>
+        <div class="scroll-indicator" onclick="window.scrollTo({ top: document.querySelector('.devblog').offsetTop - 160, behavior: 'smooth' })">
+            <span>Devlog</span>
+        </div>
     </section>
 
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 1rem; font-size: 0.85rem; background: transparent; z-index: 10;">
+    <!-- Devblog Section -->
+    <section class="devblog">
+        <div class="devblog-container">
+            <div class="blog-posts">
+                <article class="blog-post">
+                    <time datetime="2025-01-12">January 12, 2025</time>
+                    <h3>Elevator System Implementation</h3>
+                    <p>Added a fully functional elevator system to the building! Players can now enter elevators, select floors, and watch the smooth transitions between levels. The system includes proper door animations and floor indicators.</p>
+                </article>
+                
+                <article class="blog-post">
+                    <time datetime="2025-01-10">January 10, 2025</time>
+                    <h3>NPC Behaviors and AI</h3>
+                    <p>Implemented autonomous NPC behaviors. Citizens now have their own daily routines, moving between floors, entering buildings, and interacting with the environment. Each NPC has unique movement patterns making the city feel more alive.</p>
+                </article>
+                
+                <article class="blog-post">
+                    <time datetime="2025-01-08">January 8, 2025</time>
+                    <h3>Building Interior System</h3>
+                    <p>Created a modular building system with multiple floors. Each floor can have different room layouts and purposes. Added proper collision detection and depth sorting for a realistic 2.5D feel.</p>
+                </article>
+                
+                <article class="blog-post">
+                    <time datetime="2025-01-05">January 5, 2025</time>
+                    <h3>Early Access Launch</h3>
+                    <p>Bitworld.gg is now open for early access signups! The core game engine is complete with pixel-perfect rendering, smooth character movement, and the foundation for our growing city simulation.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <footer style="position: relative; text-align: center; padding: 3rem 1rem 2rem; font-size: 0.85rem; background: transparent; z-index: 10;">
         Made with ❤️ by <a href="https://twitter.com/super3" target="_blank" style="color: var(--accent); text-decoration: none; transition: color 0.2s ease;">super3</a>
     </footer>
 

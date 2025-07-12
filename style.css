@@ -152,13 +152,25 @@ body.index-page {
 
 /* Hero Section */
 .hero {
-    min-height: 100vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
     overflow: hidden;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: linear-gradient(to bottom, transparent, var(--dark-bg) 90%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .hero-content {
@@ -170,7 +182,7 @@ body.index-page {
     gap: 3rem;
     max-width: 1200px;
     margin: 0 auto;
-    min-height: 100vh;
+    min-height: auto;
 }
 
 .hero-left {
@@ -347,6 +359,43 @@ body.index-page {
     image-rendering: crisp-edges;
 }
 
+/* Scroll indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 20;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+.scroll-indicator:hover {
+    opacity: 1;
+}
+
+.scroll-indicator span {
+    color: var(--text-light);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    display: block;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-indicator::after {
+    content: '▼';
+    color: var(--accent);
+    font-size: 1.8rem;
+}
+
 @keyframes float {
     0%, 100% {
         transform: translateY(0) translateX(0);
@@ -364,6 +413,10 @@ body.index-page {
 
 /* Index page responsive styles */
 @media (max-width: 968px) {
+    .hero {
+        min-height: 80vh;
+    }
+    
     .hero-content {
         flex-direction: column;
         padding: 1rem;
@@ -394,11 +447,11 @@ body.index-page {
 @media (max-width: 768px) {
     .hero {
         padding: 1rem 0;
-        min-height: 100vh;
+        min-height: 75vh;
     }
     
     .hero-content {
-        min-height: 100vh;
+        min-height: auto;
         padding: 2rem 1rem 5rem;
         gap: 2.5rem;
     }
@@ -442,11 +495,20 @@ body.index-page {
 @media (max-width: 480px) {
     .hero {
         padding: 1.5rem 0;
+        min-height: 70vh;
     }
     
     .hero-content {
         padding: 1.5rem 1rem 5rem;
         gap: 2rem;
+    }
+    
+    .scroll-indicator {
+        bottom: 1rem;
+    }
+    
+    .scroll-indicator span {
+        font-size: 0.8rem;
     }
     
     .hero h1 {
@@ -500,6 +562,109 @@ body.index-page {
         font-size: 0.85rem;
         height: 32px;
         right: 6px;
+    }
+}
+
+/* Devblog Section */
+.devblog {
+    padding: 2rem 2rem 4rem;
+    background: var(--dark-bg);
+    position: relative;
+}
+
+.devblog::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, var(--dark-bg));
+    pointer-events: none;
+}
+
+.devblog-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.blog-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.blog-post {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blog-post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    transform-origin: top;
+}
+
+.blog-post:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(33, 150, 243, 0.4);
+    transform: translateX(4px);
+}
+
+.blog-post:hover::before {
+    transform: scaleY(1);
+}
+
+.blog-post time {
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.blog-post h3 {
+    color: var(--text-light);
+    font-size: 1.5rem;
+    margin: 0.75rem 0 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.blog-post p {
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-size: 1.05rem;
+}
+
+/* Responsive styles for devblog */
+@media (max-width: 768px) {
+    .devblog {
+        padding: 1.5rem 1rem 3rem;
+    }
+    
+    .blog-post {
+        padding: 1.5rem;
+    }
+    
+    .blog-post h3 {
+        font-size: 1.25rem;
+    }
+    
+    .blog-post p {
+        font-size: 1rem;
     }
 }
 
