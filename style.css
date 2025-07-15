@@ -362,7 +362,7 @@ body.index-page {
 /* Scroll indicator */
 .scroll-indicator {
     position: absolute;
-    bottom: 3rem;
+    bottom: 0.5rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -504,7 +504,9 @@ body.index-page {
     }
     
     .scroll-indicator {
-        bottom: 1rem;
+        position: relative;
+        bottom: auto;
+        margin-top: 2rem;
     }
     
     .scroll-indicator span {
