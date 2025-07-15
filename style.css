@@ -8,6 +8,7 @@
     --text-light: #f5f7fa;
     --text-dim: #94a3b8;
     --accent: #64b5f6;
+    --accent-hover: #90caf9;
 }
 
 * {
@@ -27,7 +28,7 @@ body {
 .game-wrapper {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0.75rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 2px solid rgba(33, 150, 243, 0.3);
 }
@@ -197,11 +198,175 @@ body.index-page {
 
 #game-preview-container {
     width: 400px;
-    height: 300px;
+    height: 200px;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
     background: #2c3e50;
+}
+
+/* NPC Feed Styles - Twitter-like */
+.npc-feed {
+    margin-top: 0.75rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 220px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feed-header {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feed-header span {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: -0.02em;
+}
+
+.feed-compose {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.feed-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.feed-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+}
+
+.feed-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.feed-post-btn {
+    background: var(--accent);
+    color: var(--dark-bg);
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.8;
+}
+
+.feed-post-btn:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.feed-post-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.feed-messages {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 150px;
+}
+
+.feed-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.feed-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.feed-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.feed-message {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.feed-message:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.feed-message:last-child {
+    border-bottom: none;
+}
+
+.feed-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--dark-bg);
+}
+
+.feed-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.feed-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.feed-name {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.feed-username {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.feed-time {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    margin-left: auto;
+}
+
+.feed-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
 .hero h1 {
@@ -476,7 +641,7 @@ body.index-page {
     
     #game-preview-container {
         width: 400px;
-        height: 300px;
+        height: 200px;
     }
     
     .email-input {
@@ -540,7 +705,7 @@ body.index-page {
     
     #game-preview-container {
         width: 400px;
-        height: 300px;
+        height: 200px;
     }
     
     .preview-header {

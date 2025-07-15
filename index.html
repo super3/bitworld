@@ -36,9 +36,20 @@
             <div class="game-preview">
                 <div class="preview-header">
                     <div class="preview-header-left">LIVE CAMERA</div>
-                    <div class="viewer-count">1 viewer</div>
+                    <div class="viewer-count">3 citizens</div>
                 </div>
                 <div id="game-preview-container"></div>
+                <!-- Twitter-style Feed -->
+                <div class="npc-feed">
+                    <div class="feed-messages" id="feedMessages">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div class="feed-compose">
+                        <div class="feed-avatar">Y</div>
+                        <input type="text" class="feed-input" id="feedInput" placeholder="What's happening in the city?" maxlength="280">
+                        <button class="feed-post-btn" onclick="postToFeed()" id="feedPostBtn">Post</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="scroll-indicator" onclick="window.scrollTo({ top: document.querySelector('.devblog').offsetTop - 160, behavior: 'smooth' })">
@@ -181,6 +192,113 @@
             });
         });
 
+        // NPC Feed functionality
+        const npcData = {
+            'John Sim': { username: 'johnsim', sprite: 'assets/npc/male/NPC 1.png' },
+            'Alice Lee': { username: 'alicelee', sprite: 'assets/npc/female/NPC 2.png' },
+            'Sarah Johnson': { username: 'sarahj', sprite: 'assets/npc/female/NPC 3.png' }
+        };
+        const npcNames = Object.keys(npcData);
+        const npcMessages = [
+            "Just moved to the 3rd floor! Loving the view already 🏙️",
+            "Anyone else hear that music from the lobby? It's pretty good!",
+            "The elevator is so smooth now after the upgrade",
+            "Meeting new neighbors today. This building has such a great community",
+            "Working from home has never been better with this city view",
+            "Can't believe how fast this place is growing!",
+            "Coffee shop on the ground floor makes the best latte ☕",
+            "Sunset from the rooftop is absolutely stunning tonight",
+            "New to the building! Any tips for a newcomer?",
+            "Love how walkable this neighborhood is becoming"
+        ];
+
+        function postToFeed() {
+            const feedInput = document.getElementById('feedInput');
+            const message = feedInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user's message
+            addFeedMessage('You', 'player', message);
+            
+            // Clear input
+            feedInput.value = '';
+            
+            // Simulate NPC response after a delay
+            setTimeout(() => {
+                const respondingNPC = npcNames[Math.floor(Math.random() * npcNames.length)];
+                
+                const responses = [
+                    `Welcome to the building, @player!`,
+                    `That's a great observation!`,
+                    `I totally agree with you`,
+                    `Thanks for sharing that!`,
+                    `Interesting perspective 🤔`,
+                    `Couldn't have said it better myself`
+                ];
+                
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addFeedMessage(respondingNPC, npcData[respondingNPC].username, response);
+            }, 2000 + Math.random() * 2000);
+        }
+
+        function addFeedMessage(name, username, message, minutesAgo = 0) {
+            const feedMessages = document.getElementById('feedMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'feed-message';
+            
+            const initial = name.charAt(0);
+            const timeText = minutesAgo === 0 ? 'now' : `${minutesAgo}m`;
+            
+            messageDiv.innerHTML = `
+                <div class="feed-avatar">${initial}</div>
+                <div class="feed-content">
+                    <div class="feed-header-row">
+                        <span class="feed-name">${name}</span>
+                        <span class="feed-username">@${username}</span>
+                        <span class="feed-time">${timeText}</span>
+                    </div>
+                    <div class="feed-text">${message}</div>
+                </div>
+            `;
+            
+            // Add to bottom of feed
+            feedMessages.appendChild(messageDiv);
+            
+            // Keep only last 10 messages
+            while (feedMessages.children.length > 10) {
+                feedMessages.removeChild(feedMessages.firstChild);
+            }
+            
+            // Auto-scroll to bottom
+            feedMessages.scrollTop = feedMessages.scrollHeight;
+        }
+
+        // Initialize with some messages
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add initial messages (oldest first)
+            addFeedMessage('John Sim', npcData['John Sim'].username, 'The elevator is so smooth now after the upgrade', 12);
+            addFeedMessage('Alice Lee', npcData['Alice Lee'].username, 'Anyone else hear that music from the lobby? It\'s pretty good!', 7);
+            addFeedMessage('Sarah Johnson', npcData['Sarah Johnson'].username, 'Just moved to the 3rd floor! Loving the view already 🏙️', 2);
+            
+            // Simulate new messages appearing
+            setInterval(() => {
+                const randomName = npcNames[Math.floor(Math.random() * npcNames.length)];
+                const randomMessage = npcMessages[Math.floor(Math.random() * npcMessages.length)];
+                addFeedMessage(randomName, npcData[randomName].username, randomMessage);
+            }, 8000 + Math.random() * 7000);
+            
+            // Handle enter key in feed input
+            const feedInput = document.getElementById('feedInput');
+            if (feedInput) {
+                feedInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        postToFeed();
+                    }
+                });
+            }
+        });
+
 
         function showMessage(text, type) {
             const formMessage = document.getElementById('formMessage');
@@ -229,7 +347,7 @@
                     this.elevatorManager = new ElevatorManager(this);
                     
                     // Adjust camera to show bottom floor
-                    this.cameras.main.scrollY = 300; // Scroll down to show lobby/bottom floor
+                    this.cameras.main.scrollY = 393; // Scroll down to show lobby and 1st floor
                     this.cameras.main.scrollX = 177; // Scroll right to center the building
                     
                     // Disable keyboard plugin to prevent any key capture
@@ -259,7 +377,7 @@
             const previewConfig = {
                 type: Phaser.AUTO,
                 width: 400,
-                height: 300,
+                height: 200,
                 parent: 'game-preview-container',
                 backgroundColor: GameConfig.BACKGROUND_COLOR,
                 pixelArt: true,
