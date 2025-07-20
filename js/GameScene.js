@@ -325,6 +325,9 @@ onElevatorZoneClicked(targetFloor, player) {
         const dt = delta / 1000;
 
         this.players.forEach(({ player, sprite }) => {
+            // Update player status (thirst, hunger, sleep)
+            player.updateStatus(dt);
+            
             // Handle automated NPC behavior
             if (player.isAutomated && player !== this.selectedPlayer && !player.waitingForElevator && !player.inElevator) {
                 // If they have a player-commanded movement, use normal movement
@@ -383,6 +386,7 @@ onElevatorZoneClicked(targetFloor, player) {
 
 
         this.sidebar.updatePosition();
+        this.sidebar.updateStatusBars();
         //this.inputManager.update(dt);
     }
 

@@ -30,6 +30,12 @@ class Player {
         this.inElevator = false;
         this.walkingThroughDoor = false;
         this.elevatorClickTimer  = null;
+        
+        // Status attributes (0-100 scale)
+        this.thirst = 100;  // 100 = fully hydrated, 0 = extremely thirsty
+        this.hunger = 100;  // 100 = full, 0 = starving
+        this.sleep = 100;   // 100 = well-rested, 0 = exhausted
+        this.toilet = 100;  // 100 = no need, 0 = urgent need
     }
 
 
@@ -56,5 +62,23 @@ class Player {
         this.vx = 0;
         this.targetX = null;
         this.isWalking = false;
+    }
+    
+    /**
+     * Update player status values over time
+     * @param {number} dt - Delta time in seconds
+     */
+    updateStatus(dt) {
+        // Status degradation rates per second
+        const THIRST_RATE = 0.5;  // Lose 0.5% thirst per second
+        const HUNGER_RATE = 0.3;  // Lose 0.3% hunger per second  
+        const SLEEP_RATE = 0.2;   // Lose 0.2% sleep per second
+        const TOILET_RATE = 0.4;  // Lose 0.4% toilet per second
+        
+        // Update status values
+        this.thirst = Math.max(0, this.thirst - (THIRST_RATE * dt));
+        this.hunger = Math.max(0, this.hunger - (HUNGER_RATE * dt));
+        this.sleep = Math.max(0, this.sleep - (SLEEP_RATE * dt));
+        this.toilet = Math.max(0, this.toilet - (TOILET_RATE * dt));
     }
 } 
